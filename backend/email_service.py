@@ -1,9 +1,7 @@
 """
 Email Service — Gmail OAuth2 email sending for payment reminders.
-Uses direct HTTP requests to Google OAuth2 token endpoint and smtplib with XOAUTH2.
+Uses direct HTTP requests to Google OAuth2 token endpoint and Gmail REST API.
 """
-import smtplib
-import socket
 import json
 import logging
 from email.mime.text import MIMEText
@@ -68,33 +66,12 @@ def get_access_token(client_id: str, client_secret: str, refresh_token: str) -> 
         logger.error(f"Failed to get Gmail access token: {e}")
         raise ValueError(f"Failed to obtain Gmail access token: {e}")
 
-
-def _build_xoauth2_string(user_email: str, access_token: str) -> str:
-    """Build the XOAUTH2 authentication string for SMTP."""
-    return f"user={user_email}\x01auth=Bearer {access_token}\x01\x01"
-
-
 # ==========================================
-# IPv4-only SMTP (fixes Railway IPv6 issues)
+# Gmail REST API — Send via HTTPS (port 443)
 # ==========================================
-class IPv4SMTP(smtplib.SMTP):
-    """SMTP client that forces IPv4 connections.
-    Fixes [Errno 101] Network is unreachable on Railway,
-    where IPv6 DNS resolution succeeds but outbound IPv6 is blocked."""
-    def _get_socket(self, host, port, timeout):
-        addrs = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-        if not addrs:
-            raise OSError(f"Could not resolve {host}:{port} via IPv4")
-        af, socktype, proto, canonname, sa = addrs[0]
-        sock = socket.socket(af, socktype, proto)
-        sock.settimeout(timeout)
-        sock.connect(sa)
-        return sock
+GMAIL_SEND_URL = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
 
 
-# ==========================================
-# Email Sending
-# ==========================================
 def send_email(
     sender: str,
     to: str,
@@ -104,9 +81,13 @@ def send_email(
     is_html: bool = False,
     access_token: str = None
 ) -> dict:
-    """Send an email via Gmail SMTP using OAuth2 XOAUTH2 authentication."""
+    """Send an email via Gmail REST API using OAuth2 access token.
+    Uses HTTPS (port 443) instead of SMTP (port 587) to avoid
+    Railway's outbound SMTP port restrictions."""
     if not access_token:
         raise ValueError("Access token is required")
+
+    import base64 as b64
 
     msg = MIMEMultipart("alternative")
     msg["From"] = sender
@@ -119,26 +100,26 @@ def send_email(
     content_type = "html" if is_html else "plain"
     msg.attach(MIMEText(body, content_type, "utf-8"))
 
-    # Build recipient list
-    recipients = [to]
-    if cc:
-        cc_list = [email.strip() for email in cc.split(",") if email.strip()]
-        recipients.extend(cc_list)
-
     try:
-        with IPv4SMTP("smtp.gmail.com", 587, timeout=30) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            # XOAUTH2 authentication
-            auth_string = _build_xoauth2_string(sender, access_token)
-            server.docmd("AUTH", "XOAUTH2 " + 
-                        __import__("base64").b64encode(auth_string.encode()).decode())
-            server.sendmail(sender, recipients, msg.as_string())
+        # Base64url-encode the entire MIME message
+        raw_message = b64.urlsafe_b64encode(msg.as_bytes()).decode("ascii")
 
-        return {"status": "sent", "error": None}
-    except smtplib.SMTPAuthenticationError as e:
-        error_msg = f"Gmail authentication failed. Check your OAuth2 credentials. ({e})"
+        # POST to Gmail REST API
+        payload = json.dumps({"raw": raw_message}).encode("utf-8")
+        req = Request(GMAIL_SEND_URL, data=payload, method="POST")
+        req.add_header("Authorization", f"Bearer {access_token}")
+        req.add_header("Content-Type", "application/json")
+
+        with urlopen(req, timeout=30) as resp:
+            if resp.status in (200, 202):
+                return {"status": "sent", "error": None}
+            resp_body = resp.read().decode()
+            error_msg = f"Gmail API returned status {resp.status}: {resp_body}"
+            logger.error(error_msg)
+            return {"status": "failed", "error": error_msg}
+
+    except URLError as e:
+        error_msg = f"Gmail API request failed: {e}"
         logger.error(error_msg)
         return {"status": "failed", "error": error_msg}
     except Exception as e:
