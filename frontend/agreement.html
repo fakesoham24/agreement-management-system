@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Agreement Analysis — Deep analysis, timeline, payment structure, and legal clauses">
+    <title>Agreement Analysis — Agreement Management</title>
+    <link rel="icon" type="image/webp" href="/static/favicon.webp">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/logo.webp" alt="D&amp;V Business Consulting" style="
+    width: 169px;
+    height: 81px;
+">
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a class="nav-item" href="/dashboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Dashboard
+                    </a>
+                    <a class="nav-item" href="/payments">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                        Payments
+                    </a>
+                    <a class="nav-item" href="/renewals">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115.36-6.36L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15.36 6.36L3 16"/></svg>
+                        Renewals
+                    </a>
+                </div>
+                <div class="nav-section" id="admin-nav-section" style="display:none">
+                    <div class="nav-section-title">Administration</div>
+                    <a class="nav-item" href="/admin">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Admin Panel
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-details">
+                        <div class="user-name" id="user-name">User</div>
+                        <div class="user-role" id="user-role">User</div>
+                    </div>
+                    <button class="btn-ghost btn-icon" onclick="Auth.logout()" title="Logout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="mobile-toggle" onclick="toggleSidebar()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <h1 id="page-title">Agreement Analysis</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-sm btn-outline" id="view-doc-btn" onclick="viewOriginalDocument()" title="View uploaded document in new tab">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Document
+                    </button>
+                    <button class="btn btn-sm btn-export" id="export-pdf-btn" onclick="exportPDF()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export PDF
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="edit-toggle-btn" onclick="toggleEditMode()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit Details
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <a href="/dashboard" class="back-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Back to Dashboard
+                </a>
+
+                <!-- Loading state -->
+                <div id="loading-state" style="text-align:center;padding:48px">
+                    <div class="loading-spinner" style="width:32px;height:32px;border-width:3px"></div>
+                </div>
+
+                <!-- Detail Content -->
+                <div id="detail-content" style="display:none">
+                    <div class="detail-grid">
+
+                        <!-- ======================== -->
+                        <!-- Section 1: Agreement Overview -->
+                        <!-- ======================== -->
+                        <div class="detail-section detail-section-full" id="section-overview">
+                            <div class="section-title">
+                                <div class="section-icon-badge blue">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
+                                </div>
+                                Agreement Overview
+                            </div>
+                            <!-- Badges -->
+                            <div class="badges-row" id="overview-badges"></div>
+                            <!-- Fields in 2-column grid -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px">
+                                <div class="detail-row">
+                                    <span class="detail-label">Company Name</span>
+                                    <span class="detail-value" id="ov-company">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Agreement ID</span>
+                                    <span class="detail-value" id="ov-id">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Agreement Title</span>
+                                    <span class="detail-value" id="ov-title">—</span>
+                                </div>
+
+                                <div class="detail-row">
+                                    <span class="detail-label">Contact Person</span>
+                                    <span class="detail-value" id="ov-contact">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Created Date</span>
+                                    <span class="detail-value" id="ov-created">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Effective Date</span>
+                                    <span class="detail-value" id="ov-effective">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Expiry Date</span>
+                                    <span class="detail-value" id="ov-expiry">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Agreement Status</span>
+                                    <span class="detail-value" id="ov-status">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Priority Level</span>
+                                    <span class="detail-value" id="ov-priority">—</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Currency</span>
+                                    <span class="detail-value" id="ov-currency">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ======================== -->
+                        <!-- Section 2: Company Information -->
+                        <!-- ======================== -->
+                        <div class="detail-section" id="section-company">
+                            <div class="section-title">
+                                <div class="section-icon-badge green">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>
+                                </div>
+                                Company Information
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Company Name</span>
+                                <span class="detail-value" id="ci-company">—</span>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label">Contact Person</span>
+                                <span class="detail-value" id="ci-contact">—</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value" id="ci-email">—</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Phone</span>
+                                <span class="detail-value" id="ci-phone">—</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Alternate Contact</span>
+                                <span class="detail-value" id="ci-alt-contact">—</span>
+                            </div>
+                        </div>
+
+                        <!-- ======================== -->
+                        <!-- Section 3: Agreement Timeline -->
+                        <!-- ======================== -->
+                        <div class="detail-section" id="section-timeline">
+                            <div class="section-title">
+                                <div class="section-icon-badge amber">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                </div>
+                                Agreement Timeline
+                            </div>
+                            <div class="timeline-6" id="timeline-container"></div>
+                        </div>
+
+                        <!-- ======================== -->
+                        <!-- Section 4: Payment Structure -->
+                        <!-- ======================== -->
+                        <div class="detail-section detail-section-full" id="section-payment">
+                            <div class="section-title">
+                                <div class="section-icon-badge purple">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                                </div>
+                                Payment Structure
+                            </div>
+
+                            <!-- Payment plans table -->
+                            <div style="overflow-x:auto">
+                                <table class="payment-table-enhanced" id="payment-plans-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Plan</th>
+                                            <th>Amount</th>
+                                            <th>GST (18%)</th>
+                                            <th>TDS (10%)</th>
+                                            <th>Net</th>
+                                            <th>Due Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="payment-plans-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div id="no-payment-plans" class="section-empty" style="display:none">
+                                No payment schedule available.
+                            </div>
+                        </div>
+
+                        <!-- ======================== -->
+                        <!-- Section 5: Consulting Visit Schedule -->
+                        <!-- ======================== -->
+                        <div class="detail-section" id="section-visits">
+                            <div class="section-title">
+                                <div class="section-icon-badge teal">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                                </div>
+                                Consulting Visit Schedule
+                            </div>
+                            <table class="visit-table" id="visit-table" style="display:none">
+                                <thead>
+                                    <tr>
+                                        <th>Consulting Team</th>
+                                        <th>Total Number of Visits</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visit-tbody"></tbody>
+                            </table>
+                            <div id="no-visits" class="section-empty" style="display:none">
+                                No consulting visit schedule available.
+                            </div>
+                        </div>
+
+                        <!-- ======================== -->
+                        <!-- Section 6: Legal Clauses -->
+                        <!-- ======================== -->
+                        <div class="detail-section" id="section-legal">
+                            <div class="section-title">
+                                <div class="section-icon-badge red">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                Legal Clauses
+                            </div>
+                            <div class="clauses-grid" id="clauses-grid"></div>
+                        </div>
+
+                        <!-- ======================== -->
+                        <!-- Section: Services Provided -->
+                        <!-- ======================== -->
+                        <div class="detail-section detail-section-full" id="section-services">
+                            <div class="section-title">
+                                <div class="section-icon-badge teal">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+                                </div>
+                                Services Provided
+                            </div>
+                            <table class="visit-table" id="services-table" style="display:none">
+                                <thead>
+                                    <tr>
+                                        <th>Service Name</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="services-tbody"></tbody>
+                            </table>
+                            <div id="no-services" class="section-empty" style="display:none">
+                                No services information available.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ======================== -->
+                    <!-- Edit Form (hidden by default) -->
+                    <!-- ======================== -->
+                    <div id="edit-form" style="display:none; margin-top:24px">
+                        <div class="detail-section detail-section-full">
+                            <div class="section-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px;color:var(--color-accent)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                Edit Agreement Details
+                            </div>
+
+                            <!-- Agreement Overview -->
+                            <div class="edit-section-title">Agreement Overview</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                                <div class="form-group">
+                                    <label>Company Name</label>
+                                    <input type="text" class="form-input" id="edit-company">
+                                </div>
+                                <div class="form-group">
+                                    <label>Agreement Title</label>
+                                    <input type="text" class="form-input" id="edit-agreement-title">
+                                </div>
+                                <div class="form-group">
+                                    <label>Contact Person</label>
+                                    <input type="text" class="form-input" id="edit-contact-person">
+                                </div>
+                                <div class="form-group">
+                                    <label>Agreement Date</label>
+                                    <input type="date" class="form-input" id="edit-agreement-date">
+                                </div>
+                                <div class="form-group">
+                                    <label>Effective Date</label>
+                                    <input type="date" class="form-input" id="edit-effective-date">
+                                </div>
+                                <div class="form-group">
+                                    <label>Expiry Date</label>
+                                    <input type="date" class="form-input" id="edit-expiry-date">
+                                </div>
+                                <div class="form-group">
+                                    <label>Priority Level</label>
+                                    <select class="form-input" id="edit-priority-level">
+                                        <option value="Casual">Casual</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Currency</label>
+                                    <select class="form-input" id="edit-currency">
+                                        <option value="₹">₹ Indian Rupee</option>
+                                        <option value="$">$ US Dollar</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Company Information -->
+                            <div class="edit-section-title">Company Information</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" class="form-input" id="edit-email" onblur="validateField('email')">
+                                    <span class="field-error" id="error-email"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone</label>
+                                    <input type="tel" class="form-input" id="edit-phone" onblur="validateField('phone')">
+                                    <span class="field-error" id="error-phone"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Alternate Contact (Phone)</label>
+                                    <input type="tel" class="form-input" id="edit-alt-contact" onblur="validateField('alt-contact')">
+                                    <span class="field-error" id="error-alt-contact"></span>
+                                </div>
+                            </div>
+
+                            <!-- Timeline Dates -->
+                            <div class="edit-section-title">Timeline Dates</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                                <div class="form-group">
+                                    <label>Consulting Start Date</label>
+                                    <input type="date" class="form-input" id="edit-start-date">
+                                </div>
+                                <div class="form-group">
+                                    <label>Consulting End Date</label>
+                                    <input type="date" class="form-input" id="edit-end-date">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Active Date</label>
+                                    <input type="date" class="form-input" id="edit-active-date">
+                                </div>
+                                <div class="form-group">
+                                    <label>Renewal Due Date</label>
+                                    <input type="date" class="form-input" id="edit-renewal-due-date">
+                                </div>
+                            </div>
+
+                            <!-- Legal Clauses -->
+                            <div class="edit-section-title">Legal Clauses</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                                <div class="form-group">
+                                    <label>NDA Included</label>
+                                    <select class="form-input" id="edit-nda">
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                        <option value="Not Mentioned">Not Mentioned</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Non-Solicitation</label>
+                                    <select class="form-input" id="edit-non-solicitation">
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                        <option value="Not Mentioned">Not Mentioned</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Non-Compete</label>
+                                    <select class="form-input" id="edit-non-compete">
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                        <option value="Not Mentioned">Not Mentioned</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Confidentiality Clause</label>
+                                    <select class="form-input" id="edit-confidentiality">
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                        <option value="Not Mentioned">Not Mentioned</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Data Protection Clause</label>
+                                    <select class="form-input" id="edit-data-protection">
+                                        <option value="">Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                        <option value="Not Mentioned">Not Mentioned</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Arbitration Clause</label>
+                                    <input type="text" class="form-input" id="edit-arbitration">
+                                </div>
+                                <div class="form-group">
+                                    <label>Jurisdiction</label>
+                                    <input type="text" class="form-input" id="edit-jurisdiction">
+                                </div>
+                            </div>
+
+                            <!-- Payment Structure -->
+                            <div class="edit-section-title">Payment Structure</div>
+                            <div style="overflow-x:auto">
+                                <table class="payment-table-enhanced" id="edit-payment-table" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Plan</th>
+                                            <th>Amount</th>
+                                            <th>GST (18%)</th>
+                                            <th>TDS (10%)</th>
+                                            <th>Net</th>
+                                            <th>Due Date</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="edit-payment-tbody"></tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addPaymentPlanRow()" style="margin-top:8px">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add Payment Plan
+                            </button>
+
+                            <!-- Services -->
+                            <div class="edit-section-title">Services Provided</div>
+                            <div id="edit-services-container"></div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addServiceRow()" style="margin-top:8px">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add Service
+                            </button>
+
+                            <div class="edit-controls">
+                                <button class="btn btn-secondary" onclick="toggleEditMode()">Cancel</button>
+                                <button class="btn btn-primary" onclick="saveAnalysis()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+        if (!Auth.requireAuth()) throw new Error('Not authenticated');
+
+        const user = Auth.getUser();
+        const agreementId = window.location.pathname.split('/').pop();
+        let agreementData = null;
+        let analysisData = null;
+        let paymentsData = [];
+        let editMode = false;
+
+        // Get agreement currency
+        function getCurrency() {
+            return (analysisData && analysisData.currency) || '₹';
+        }
+
+        function fmt(amount) {
+            return formatCurrency(amount, getCurrency());
+        }
+
+        function initUI() {
+            document.getElementById('user-name').textContent = user.full_name;
+            document.getElementById('user-role').textContent = user.role;
+            document.getElementById('user-avatar').textContent = user.full_name.charAt(0).toUpperCase();
+            if (user.role === 'admin') {
+                document.getElementById('admin-nav-section').style.display = 'block';
+            }
+        }
+
+        async function loadAgreement() {
+            try {
+                const data = await api.get(`/agreements/${agreementId}`);
+                agreementData = data.agreement;
+                analysisData = data.analysis || {};
+                paymentsData = data.payments || [];
+
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('detail-content').style.display = 'block';
+
+                renderOverview();
+                renderCompanyInfo();
+                renderTimeline();
+                renderPaymentStructure();
+                renderConsultingVisits();
+                renderLegalClauses();
+                renderServices();
+            } catch (err) {
+                showToast(err.message, 'error');
+                document.getElementById('loading-state').innerHTML = `<p style="color:var(--color-danger)">${err.message}</p>`;
+            }
+        }
+
+        // ========================
+        // Section 1: Agreement Overview
+        // ========================
+        function renderOverview() {
+            document.getElementById('page-title').textContent = analysisData.company_name || 'Agreement Analysis';
+
+            // Badges
+            const badges = [];
+            const status = (agreementData.status || '').toLowerCase();
+            if (status === 'active') {
+                badges.push(`<span class="badge-lg badge-active"><span class="badge-dot"></span> Active</span>`);
+            } else if (status === 'expired') {
+                badges.push(`<span class="badge-lg badge-expired"><span class="badge-dot"></span> Expired</span>`);
+            } else if (status === 'pending') {
+                badges.push(`<span class="badge-lg badge-pending"><span class="badge-dot"></span> Pending</span>`);
+            }
+
+            const expiryDate = analysisData.expiry_date || analysisData.consulting_end_date;
+            if (expiryDate) {
+                const days = daysUntil(expiryDate);
+                if (days !== null && days > 0 && days <= 90) {
+                    badges.push(`<span class="badge-lg badge-expires"><span class="badge-dot"></span> Expires in ${days} days</span>`);
+                }
+            }
+
+            document.getElementById('overview-badges').innerHTML = badges.join('');
+
+            // Fields
+            el('ov-company', analysisData.company_name);
+            el('ov-id', `AG-${String(agreementData.id).padStart(4, '0')}`);
+            el('ov-title', analysisData.agreement_title || agreementData.file_name);
+            el('ov-contact', analysisData.contact_person);
+            el('ov-created', formatDate(analysisData.agreement_date || agreementData.uploaded_at));
+            el('ov-effective', formatDate(analysisData.effective_date));
+            el('ov-expiry', formatDate(analysisData.expiry_date || analysisData.consulting_end_date));
+            document.getElementById('ov-status').innerHTML = statusBadge(agreementData.status);
+            el('ov-priority', analysisData.priority_level);
+            el('ov-currency', getCurrency() === '₹' ? '₹ Indian Rupee (INR)' : '$ US Dollar (USD)');
+        }
+
+        // ========================
+        // Section 2: Company Information
+        // ========================
+        function renderCompanyInfo() {
+            elOrMuted('ci-company', analysisData.company_name);
+            elOrMuted('ci-contact', analysisData.contact_person);
+            elOrMuted('ci-email', analysisData.email);
+            elOrMuted('ci-phone', analysisData.phone);
+            elOrMuted('ci-alt-contact', analysisData.alternate_contact);
+        }
+
+        // ========================
+        // Section 3: Agreement Timeline
+        // ========================
+        function renderTimeline() {
+            const now = new Date();
+            const events = [
+                { label: 'Active', date: analysisData.active_date || analysisData.effective_date || analysisData.consulting_start_date },
+                { label: 'Renewal Due', date: analysisData.renewal_due_date },
+                { label: 'Expired', date: analysisData.expiry_date || analysisData.consulting_end_date },
+            ];
+
+            // Determine status for each event
+            let lastCompletedIdx = -1;
+            events.forEach((ev, i) => {
+                if (ev.date) {
+                    const d = new Date(ev.date);
+                    if (!isNaN(d.getTime()) && d <= now) {
+                        ev.status = 'completed';
+                        lastCompletedIdx = i;
+                    } else if (!isNaN(d.getTime())) {
+                        ev.status = 'upcoming';
+                    } else {
+                        ev.status = 'upcoming';
+                    }
+                } else {
+                    ev.status = 'upcoming';
+                }
+            });
+
+            // Mark the next step after last completed as current
+            if (lastCompletedIdx >= 0 && lastCompletedIdx < events.length - 1) {
+                events[lastCompletedIdx + 1].status = 'current';
+            } else if (lastCompletedIdx === -1) {
+                events[0].status = 'current';
+            }
+
+            const checkSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+            const crossSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>`;
+
+            // Determine if agreement is expired
+            const isExpired = (agreementData.status || '').toLowerCase() === 'expired';
+
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = events.map(ev => {
+                // If expired and this is the Renewal event, mark as crossed
+                let displayStatus = ev.status;
+                if (isExpired && ev.label === 'Renewal Due') {
+                    displayStatus = 'crossed';
+                }
+
+                let dotContent = '';
+                if (displayStatus === 'completed') dotContent = checkSvg;
+                else if (displayStatus === 'crossed') dotContent = crossSvg;
+
+                return `
+                <div class="timeline-item">
+                    <div class="timeline-dot ${displayStatus}">
+                        ${dotContent}
+                    </div>
+                    <div class="timeline-content">
+                        <h4>${ev.label}</h4>
+                        <p class="timeline-date">${ev.date ? formatDate(ev.date) : 'Not available'}</p>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // ========================
+        // Section 4: Payment Structure
+        // ========================
+        function renderPaymentStructure() {
+            const c = getCurrency();
+
+            // Payment plans table
+            let plans = [];
+            try {
+                plans = JSON.parse(analysisData.payment_plans || '[]');
+            } catch (e) { plans = []; }
+
+            const table = document.getElementById('payment-plans-table');
+            const tbody = document.getElementById('payment-plans-tbody');
+            const noPlans = document.getElementById('no-payment-plans');
+
+            if (!plans || plans.length === 0) {
+                table.style.display = 'none';
+                noPlans.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            noPlans.style.display = 'none';
+
+            // Calculate totals
+            let totalAmount = 0, totalGst = 0, totalTds = 0, totalNet = 0;
+
+            const rows = plans.map((p, i) => {
+                const amount = p.amount || 0;
+                const gst = p.gst || 0;
+                const tds = p.tds || 0;
+                const net = p.net || 0;
+                totalAmount += amount;
+                totalGst += gst;
+                totalTds += tds;
+                totalNet += net;
+
+                const isPaid = (p.status || '').toLowerCase() === 'paid';
+                const statusHtml = isPaid
+                    ? `<span class="badge badge-paid">Paid</span>`
+                    : `<button class="btn-mark-paid" onclick="markPlanPaid(${i})">Mark Paid</button>`;
+
+                return `
+                    <tr>
+                        <td class="plan-name">${p.plan || '—'}</td>
+                        <td>${fmt(amount)}</td>
+                        <td>${fmt(gst)}</td>
+                        <td>${fmt(tds)}</td>
+                        <td><strong>${fmt(net)}</strong></td>
+                        <td>${p.due_date ? formatDate(p.due_date) : '—'}</td>
+                        <td>${statusHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Total row
+            const totalRow = `
+                <tr class="total-row">
+                    <td class="plan-name">Total</td>
+                    <td>${fmt(totalAmount)}</td>
+                    <td>${fmt(totalGst)}</td>
+                    <td>${fmt(totalTds)}</td>
+                    <td>${fmt(totalNet)}</td>
+                    <td>—</td>
+                    <td>—</td>
+                </tr>
+            `;
+
+            tbody.innerHTML = rows + totalRow;
+        }
+
+        // ========================
+        // Section 5: Consulting Visit Schedule
+        // ========================
+        function renderConsultingVisits() {
+            let visits = [];
+            try {
+                visits = JSON.parse(analysisData.consulting_visits || '[]');
+            } catch (e) { visits = []; }
+
+            const table = document.getElementById('visit-table');
+            const tbody = document.getElementById('visit-tbody');
+            const noVisits = document.getElementById('no-visits');
+
+            if (!visits || visits.length === 0) {
+                table.style.display = 'none';
+                noVisits.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            noVisits.style.display = 'none';
+
+            tbody.innerHTML = visits.map(v => `
+                <tr>
+                    <td>${v.role || '—'}</td>
+                    <td>${v.total_visits || '—'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ========================
+        // Section 6: Legal Clauses
+        // ========================
+        function renderLegalClauses() {
+            const clauses = [
+                { label: 'NDA Included', value: analysisData.nda_included },
+                { label: 'Non-Solicitation', value: analysisData.non_solicitation },
+                { label: 'Non-Compete', value: analysisData.non_compete },
+                { label: 'Confidentiality Clause', value: analysisData.confidentiality_clause },
+                { label: 'Data Protection Clause', value: analysisData.data_protection_clause },
+                { label: 'Arbitration Clause', value: analysisData.arbitration_clause },
+                { label: 'Jurisdiction', value: analysisData.jurisdiction },
+            ];
+
+            // Filter: only show clauses that are covered (Yes, Included, or have a specific value)
+            const coveredClauses = clauses.filter(c => {
+                const val = (c.value || '').toLowerCase().trim();
+                if (!c.value || val === '' || val === 'not mentioned' || val === 'no' || val === 'not included') {
+                    return false;
+                }
+                return true;
+            });
+
+            const grid = document.getElementById('clauses-grid');
+
+            if (coveredClauses.length === 0) {
+                grid.innerHTML = '<div class="section-empty">No legal clauses covered in this agreement.</div>';
+                return;
+            }
+
+            grid.innerHTML = coveredClauses.map(c => {
+                const val = (c.value || '').toLowerCase().trim();
+                let statusClass, statusText;
+
+                if (val === 'yes' || val === 'included') {
+                    statusClass = 'included';
+                    statusText = 'Included';
+                } else {
+                    // Has a specific value (e.g., jurisdiction city)
+                    statusClass = 'value';
+                    statusText = c.value;
+                }
+
+                return `
+                    <div class="clause-item">
+                        <span class="clause-label">${c.label}</span>
+                        <span class="clause-status ${statusClass}">${statusText}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ========================
+        // Services Provided
+        // ========================
+        function renderServices() {
+            let services = [];
+            try {
+                services = JSON.parse(analysisData.services || '[]');
+            } catch (e) { services = []; }
+
+            const table = document.getElementById('services-table');
+            const tbody = document.getElementById('services-tbody');
+            const noServices = document.getElementById('no-services');
+
+            if (!services || services.length === 0) {
+                table.style.display = 'none';
+                noServices.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            noServices.style.display = 'none';
+
+            tbody.innerHTML = services.map(s => `
+                <tr>
+                    <td><strong>${s.service_name || '—'}</strong></td>
+                    <td>${s.description || '—'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ========================
+        // Mark Payment Plan as Paid
+        // ========================
+        async function markPlanPaid(index) {
+            try {
+                const result = await api.put(`/agreements/${agreementId}/payment-plans/${index}/mark-paid`);
+                showToast(result.message, 'success');
+                // Update local data
+                if (result.plans) {
+                    analysisData.payment_plans = JSON.stringify(result.plans);
+                }
+                loadAgreement();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // ========================
+        // Helpers
+        // ========================
+        function el(id, value) {
+            document.getElementById(id).textContent = value || '—';
+        }
+
+        function elOrMuted(id, value) {
+            const elem = document.getElementById(id);
+            if (value) {
+                elem.textContent = value;
+                elem.className = 'detail-value';
+            } else {
+                elem.textContent = 'Not mentioned';
+                elem.className = 'detail-value muted';
+            }
+        }
+
+        // ========================
+        // Edit Mode
+        // ========================
+        function toggleEditMode() {
+            editMode = !editMode;
+            const form = document.getElementById('edit-form');
+            const btn = document.getElementById('edit-toggle-btn');
+
+            if (editMode) {
+                form.style.display = 'block';
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg> Cancel Edit`;
+
+                // Clear validation errors
+                document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+                document.querySelectorAll('.form-input.input-error').forEach(el => el.classList.remove('input-error'));
+
+                // Populate all form fields
+                setVal('edit-company', analysisData.company_name);
+                setVal('edit-agreement-title', analysisData.agreement_title);
+                setVal('edit-contact-person', analysisData.contact_person);
+                setVal('edit-agreement-date', analysisData.agreement_date);
+                setVal('edit-effective-date', analysisData.effective_date);
+                setVal('edit-expiry-date', analysisData.expiry_date);
+                setVal('edit-priority-level', analysisData.priority_level || 'Casual');
+                setVal('edit-currency', analysisData.currency || '₹');
+
+
+
+                setVal('edit-email', analysisData.email);
+                setVal('edit-phone', analysisData.phone);
+                setVal('edit-alt-contact', analysisData.alternate_contact);
+                setVal('edit-start-date', analysisData.consulting_start_date);
+                setVal('edit-end-date', analysisData.consulting_end_date);
+
+                setVal('edit-active-date', analysisData.active_date);
+                setVal('edit-renewal-due-date', analysisData.renewal_due_date);
+                setVal('edit-nda', analysisData.nda_included);
+                setVal('edit-non-solicitation', analysisData.non_solicitation);
+                setVal('edit-non-compete', analysisData.non_compete);
+                setVal('edit-confidentiality', analysisData.confidentiality_clause);
+                setVal('edit-data-protection', analysisData.data_protection_clause);
+                setVal('edit-arbitration', analysisData.arbitration_clause);
+                setVal('edit-jurisdiction', analysisData.jurisdiction);
+
+                // Populate payment plans editor
+                populatePaymentEditor();
+
+                // Populate services editor
+                populateServicesEditor();
+
+                form.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                form.style.display = 'none';
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Details`;
+            }
+        }
+
+        function setVal(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.value = value || '';
+        }
+
+        function getVal(id) {
+            const el = document.getElementById(id);
+            return el ? (el.value || null) : null;
+        }
+
+        // ========================
+        // Industry Dropdown
+        // ========================
+        const INDUSTRY_OPTIONS = [
+            'Real Estate', 'Manufacturing', 'Information Technology',
+            'Healthcare & Pharmaceuticals', 'Banking & Financial Services',
+            'Education', 'Retail & E-commerce', 'Automotive',
+            'Telecommunications', 'Construction & Infrastructure',
+            'Energy & Utilities', 'Food & Beverage', 'Hospitality & Tourism',
+            'Agriculture', 'Media & Entertainment', 'Logistics & Transportation',
+            'Textiles & Apparel', 'Government & Public Sector'
+        ];
+
+        function populateIndustryDropdown(currentValue) {
+            const select = document.getElementById('edit-industry');
+            const otherGroup = document.getElementById('industry-other-group');
+            const otherInput = document.getElementById('edit-industry-other');
+
+            if (currentValue && INDUSTRY_OPTIONS.includes(currentValue)) {
+                select.value = currentValue;
+                otherGroup.style.display = 'none';
+                otherInput.value = '';
+            } else if (currentValue) {
+                // Value not in predefined list — select Other
+                select.value = 'Other';
+                otherGroup.style.display = 'block';
+                otherInput.value = currentValue;
+            } else {
+                select.value = '';
+                otherGroup.style.display = 'none';
+                otherInput.value = '';
+            }
+        }
+
+        function handleIndustryChange() {
+            const select = document.getElementById('edit-industry');
+            const otherGroup = document.getElementById('industry-other-group');
+            if (select.value === 'Other') {
+                otherGroup.style.display = 'block';
+            } else {
+                otherGroup.style.display = 'none';
+                document.getElementById('edit-industry-other').value = '';
+            }
+        }
+
+        function getIndustryValue() {
+            const select = document.getElementById('edit-industry');
+            if (select.value === 'Other') {
+                return document.getElementById('edit-industry-other').value || null;
+            }
+            return select.value || null;
+        }
+
+        // ========================
+        // Validation
+        // ========================
+        function validateField(fieldName) {
+            let isValid = true;
+            if (fieldName === 'email') {
+                const val = (document.getElementById('edit-email').value || '').trim();
+                const errorEl = document.getElementById('error-email');
+                const inputEl = document.getElementById('edit-email');
+                if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                    errorEl.textContent = 'Please enter a valid email address';
+                    inputEl.classList.add('input-error');
+                    isValid = false;
+                } else {
+                    errorEl.textContent = '';
+                    inputEl.classList.remove('input-error');
+                }
+            }
+            if (fieldName === 'phone') {
+                const val = (document.getElementById('edit-phone').value || '').trim();
+                const errorEl = document.getElementById('error-phone');
+                const inputEl = document.getElementById('edit-phone');
+                if (val) {
+                    const cleaned = val.replace(/[\s\-\(\)]+/g, '');
+                    if (!/^(\+91|0)?\d{10}$/.test(cleaned)) {
+                        errorEl.textContent = 'Enter 10-digit phone number (optionally with +91 or 0 prefix)';
+                        inputEl.classList.add('input-error');
+                        isValid = false;
+                    } else {
+                        errorEl.textContent = '';
+                        inputEl.classList.remove('input-error');
+                    }
+                } else {
+                    errorEl.textContent = '';
+                    inputEl.classList.remove('input-error');
+                }
+            }
+            if (fieldName === 'alt-contact') {
+                const val = (document.getElementById('edit-alt-contact').value || '').trim();
+                const errorEl = document.getElementById('error-alt-contact');
+                const inputEl = document.getElementById('edit-alt-contact');
+                if (val) {
+                    const cleaned = val.replace(/[\s\-\(\)]+/g, '');
+                    if (!/^(\+91|0)?\d{10}$/.test(cleaned)) {
+                        errorEl.textContent = 'Enter 10-digit phone number (optionally with +91 or 0 prefix)';
+                        inputEl.classList.add('input-error');
+                        isValid = false;
+                    } else {
+                        errorEl.textContent = '';
+                        inputEl.classList.remove('input-error');
+                    }
+                } else {
+                    errorEl.textContent = '';
+                    inputEl.classList.remove('input-error');
+                }
+            }
+            return isValid;
+        }
+
+        function validateAllFields() {
+            let valid = true;
+            if (!validateField('email')) valid = false;
+            if (!validateField('phone')) valid = false;
+            if (!validateField('alt-contact')) valid = false;
+            return valid;
+        }
+
+        // ========================
+        // Payment Plans Editor
+        // ========================
+        function populatePaymentEditor() {
+            const tbody = document.getElementById('edit-payment-tbody');
+            let plans = [];
+            try {
+                plans = JSON.parse(analysisData.payment_plans || '[]');
+            } catch (e) { plans = []; }
+
+            tbody.innerHTML = '';
+            if (plans.length === 0) {
+                addPaymentPlanRow();
+            } else {
+                plans.forEach(p => addPaymentPlanRow(p.plan, p.amount, p.gst, p.tds, p.net, p.due_date, p.status));
+            }
+        }
+
+        function addPaymentPlanRow(plan = '', amount = '', gst = '', tds = '', net = '', dueDate = '', status = 'Pending') {
+            const tbody = document.getElementById('edit-payment-tbody');
+            const row = document.createElement('tr');
+            row.className = 'payment-edit-row';
+            row.innerHTML = `
+                <td><input type="text" class="form-input" placeholder="Plan name" value="${escapeHtml(plan || '')}" style="min-width:100px"></td>
+                <td><input type="number" class="form-input pp-amount" placeholder="0.00" value="${amount || ''}" step="0.01" min="0" style="min-width:90px" oninput="recalcPaymentRow(this)"></td>
+                <td><input type="number" class="form-input pp-gst" placeholder="0.00" value="${gst || ''}" step="0.01" style="min-width:80px"></td>
+                <td><input type="number" class="form-input pp-tds" placeholder="0.00" value="${tds || ''}" step="0.01" style="min-width:80px"></td>
+                <td><input type="number" class="form-input pp-net" placeholder="0.00" value="${net || ''}" step="0.01" style="min-width:90px"></td>
+                <td><input type="date" class="form-input" value="${dueDate || ''}" style="min-width:130px"></td>
+                <td>
+                    <select class="form-input" style="min-width:90px">
+                        <option value="Pending" ${(status || '').toLowerCase() === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Paid" ${(status || '').toLowerCase() === 'paid' ? 'selected' : ''}>Paid</option>
+                    </select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-ghost btn-icon" onclick="this.closest('tr').remove()" title="Remove" style="color:var(--color-danger);padding:6px">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function recalcPaymentRow(amountInput) {
+            const row = amountInput.closest('tr');
+            const amount = parseFloat(amountInput.value) || 0;
+            const gst = Math.round(amount * 18 / 100 * 100) / 100;
+            const tds = Math.round(amount * 10 / 100 * 100) / 100;
+            const net = Math.round((amount + gst - tds) * 100) / 100;
+            row.querySelector('.pp-gst').value = gst || '';
+            row.querySelector('.pp-tds').value = tds || '';
+            row.querySelector('.pp-net').value = net || '';
+        }
+
+        function getPaymentPlansFromEditor() {
+            const rows = document.querySelectorAll('#edit-payment-tbody .payment-edit-row');
+            const plans = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const select = row.querySelector('select');
+                const plan = (inputs[0].value || '').trim();
+                const amount = parseFloat(inputs[1].value) || 0;
+                const gst = parseFloat(inputs[2].value) || 0;
+                const tds = parseFloat(inputs[3].value) || 0;
+                const net = parseFloat(inputs[4].value) || 0;
+                const dueDate = inputs[5].value || '';
+                const status = select ? select.value : 'Pending';
+                if (plan || amount > 0) {
+                    plans.push({ plan: plan || 'Payment', amount, gst, tds, net, due_date: dueDate, status });
+                }
+            });
+            // Sort by due_date so manually added payments are in correct order
+            plans.sort((a, b) => (a.due_date || '9999-12-31').localeCompare(b.due_date || '9999-12-31'));
+            return plans;
+        }
+
+        // ========================
+        // Services Editor
+        // ========================
+        function populateServicesEditor() {
+            const container = document.getElementById('edit-services-container');
+            let services = [];
+            try {
+                services = JSON.parse(analysisData.services || '[]');
+            } catch (e) { services = []; }
+
+            container.innerHTML = '';
+            if (services.length === 0) {
+                addServiceRow();
+            } else {
+                services.forEach(s => addServiceRow(s.service_name, s.description));
+            }
+        }
+
+        function addServiceRow(name = '', desc = '') {
+            const container = document.getElementById('edit-services-container');
+            const row = document.createElement('div');
+            row.className = 'service-edit-row';
+            row.style.cssText = 'display:grid;grid-template-columns:1fr 2fr auto;gap:8px;margin-bottom:8px;align-items:start';
+            row.innerHTML = `
+                <input type="text" class="form-input" placeholder="Service name" value="${escapeHtml(name)}">
+                <input type="text" class="form-input" placeholder="Description" value="${escapeHtml(desc)}">
+                <button type="button" class="btn btn-ghost btn-icon" onclick="this.parentElement.remove()" title="Remove" style="color:var(--color-danger);padding:8px">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        function getServicesFromEditor() {
+            const rows = document.querySelectorAll('#edit-services-container .service-edit-row');
+            const services = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const name = (inputs[0].value || '').trim();
+                const desc = (inputs[1].value || '').trim();
+                if (name) {
+                    services.push({ service_name: name, description: desc });
+                }
+            });
+            return services;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        // ========================
+        // Save Analysis
+        // ========================
+        async function saveAnalysis() {
+            // Validate before saving
+            if (!validateAllFields()) {
+                showToast('Please fix the validation errors before saving', 'error');
+                return;
+            }
+
+            const services = getServicesFromEditor();
+
+            const paymentPlans = getPaymentPlansFromEditor();
+
+            const updateData = {
+                company_name: getVal('edit-company'),
+                agreement_title: getVal('edit-agreement-title'),
+                contact_person: getVal('edit-contact-person'),
+                agreement_date: getVal('edit-agreement-date'),
+                effective_date: getVal('edit-effective-date'),
+                expiry_date: getVal('edit-expiry-date'),
+                priority_level: getVal('edit-priority-level') || 'Casual',
+                currency: getVal('edit-currency'),
+
+                payment_plans: JSON.stringify(paymentPlans),
+                email: getVal('edit-email'),
+                phone: getVal('edit-phone'),
+                alternate_contact: getVal('edit-alt-contact'),
+                consulting_start_date: getVal('edit-start-date'),
+                consulting_end_date: getVal('edit-end-date'),
+
+                active_date: getVal('edit-active-date'),
+                renewal_due_date: getVal('edit-renewal-due-date'),
+                nda_included: getVal('edit-nda'),
+                non_solicitation: getVal('edit-non-solicitation'),
+                non_compete: getVal('edit-non-compete'),
+                confidentiality_clause: getVal('edit-confidentiality'),
+                data_protection_clause: getVal('edit-data-protection'),
+                arbitration_clause: getVal('edit-arbitration'),
+                jurisdiction: getVal('edit-jurisdiction'),
+                services: JSON.stringify(services),
+            };
+
+            try {
+                await api.put(`/agreements/${agreementId}/analysis`, updateData);
+                showToast('Agreement details updated successfully', 'success');
+                toggleEditMode();
+                loadAgreement();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // ========================
+        // Export PDF
+        // ========================
+        async function loadHtml2Canvas() {
+            if (window.html2canvas) return;
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = resolve;
+                script.onerror = () => {
+                    const fallback = document.createElement('script');
+                    fallback.src = 'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js';
+                    fallback.onload = resolve;
+                    fallback.onerror = reject;
+                    document.head.appendChild(fallback);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        async function loadJsPDF() {
+            if (window.jspdf) return;
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';
+                script.onload = resolve;
+                script.onerror = () => {
+                    const fallback = document.createElement('script');
+                    fallback.src = 'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js';
+                    fallback.onload = resolve;
+                    fallback.onerror = reject;
+                    document.head.appendChild(fallback);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        async function exportPDF() {
+            const btn = document.getElementById('export-pdf-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loading-spinner" style="width:14px;height:14px;border-width:2px"></div> Generating...`;
+
+            try {
+                // Ensure both libraries are loaded (lazy load)
+                await Promise.all([loadHtml2Canvas(), loadJsPDF()]);
+
+                if (!window.jspdf) {
+                    throw new Error('Could not load PDF library. Please check your internet connection and try again.');
+                }
+
+                // Hide elements not needed in PDF
+                const editForm = document.getElementById('edit-form');
+                const editBtn = document.getElementById('edit-toggle-btn');
+                const exportBtn = document.getElementById('export-pdf-btn');
+                const backLink = document.querySelector('.back-link');
+                const markPaidBtns = document.querySelectorAll('.btn-mark-paid');
+
+                if (editForm) editForm.style.display = 'none';
+                if (editBtn) editBtn.style.display = 'none';
+                if (exportBtn) exportBtn.style.display = 'none';
+                if (backLink) backLink.style.display = 'none';
+                markPaidBtns.forEach(b => b.style.display = 'none');
+
+                const content = document.getElementById('detail-content');
+                const { jsPDF } = window.jspdf;
+
+                const canvas = await html2canvas(content, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#f8f9fb',
+                    windowWidth: content.scrollWidth,
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 10;
+                const contentWidth = pageWidth - margin * 2;
+                const imgWidth = contentWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                let heightLeft = imgHeight;
+                let position = margin;
+
+                // First page
+                pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                heightLeft -= (pageHeight - margin * 2);
+
+                // Additional pages
+                while (heightLeft > 0) {
+                    position = position - (pageHeight - margin * 2);
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                    heightLeft -= (pageHeight - margin * 2);
+                }
+
+                const companyName = (analysisData.company_name || 'Agreement').replace(/[^a-zA-Z0-9]/g, '_');
+                pdf.save(`${companyName}_Agreement.pdf`);
+
+                showToast('PDF exported successfully', 'success');
+
+                // Restore hidden elements
+                if (editBtn) editBtn.style.display = '';
+                if (exportBtn) exportBtn.style.display = '';
+                if (backLink) backLink.style.display = '';
+                markPaidBtns.forEach(b => b.style.display = '');
+            } catch (err) {
+                showToast('Failed to export PDF: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // ========================
+        // View Original Document
+        // ========================
+        async function viewOriginalDocument() {
+            const btn = document.getElementById('view-doc-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loading-spinner" style="width:14px;height:14px;border-width:2px"></div> Loading...`;
+
+            try {
+                const response = await fetch(`/api/agreements/${agreementId}/document`, {
+                    headers: { 'Authorization': `Bearer ${Auth.getToken()}` }
+                });
+                if (!response.ok) {
+                    let errMsg = 'Failed to load document';
+                    try {
+                        const err = await response.json();
+                        errMsg = err.detail || errMsg;
+                    } catch (e) {}
+                    throw new Error(errMsg);
+                }
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // Mobile sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar-backdrop').classList.toggle('open');
+        }
+        document.getElementById('sidebar-backdrop').addEventListener('click', toggleSidebar);
+
+        // Init
+        initUI();
+        loadAgreement();
+    </script>
+</body>
+</html>

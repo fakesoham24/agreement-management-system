@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Dashboard — Monitor and manage users, agreements, and system activity">
+    <title>Admin Panel — Agreement Management</title>
+    <link rel="icon" type="image/webp" href="/static/favicon.webp">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <div class="app-shell">
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/logo.webp" alt="D&amp;V Business Consulting" style="
+    width: 169px;
+    height: 81px;
+">
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a class="nav-item" href="/dashboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <rect x="3" y="3" width="7" height="7" rx="1" />
+                            <rect x="14" y="3" width="7" height="7" rx="1" />
+                            <rect x="3" y="14" width="7" height="7" rx="1" />
+                            <rect x="14" y="14" width="7" height="7" rx="1" />
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a class="nav-item" href="/payments">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <line x1="12" y1="1" x2="12" y2="23" />
+                            <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                        </svg>
+                        Payments
+                    </a>
+                    <a class="nav-item" href="/renewals">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M21 2v6h-6" />
+                            <path d="M3 12a9 9 0 0115.36-6.36L21 8" />
+                            <path d="M3 22v-6h6" />
+                            <path d="M21 12a9 9 0 01-15.36 6.36L3 16" />
+                        </svg>
+                        Renewals
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Administration</div>
+                    <a class="nav-item active" href="/admin">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                        Admin Panel
+                    </a>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name" id="user-name">Admin</div>
+                        <div class="user-role" id="user-role">admin</div>
+                    </div>
+                    <button class="btn-ghost btn-icon" onclick="Auth.logout()" title="Logout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            style="width:18px;height:18px">
+                            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="mobile-toggle" onclick="toggleSidebar()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            style="width:20px;height:20px">
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                    <h1>Admin Panel</h1>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- Stats -->
+                <div class="stats-grid" id="admin-stats" style="grid-template-columns: repeat(6, 1fr);"></div>
+
+                <!-- Tabs -->
+                <div class="filter-tabs" id="admin-tabs" style="margin-bottom:24px">
+                    <button class="filter-tab active" data-tab="users" onclick="switchTab('users')">Users</button>
+                    <button class="filter-tab" data-tab="email" onclick="switchTab('email')">Email Settings</button>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="tab-users">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                        <h3 style="font-size:1rem;font-weight:600;color:var(--color-text-primary)">User Accounts</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openCreateUserModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                style="width:15px;height:15px">
+                                <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                <circle cx="8.5" cy="7" r="4" />
+                                <line x1="20" y1="8" x2="20" y2="14" />
+                                <line x1="23" y1="11" x2="17" y2="11" />
+                            </svg>
+                            Create User
+                        </button>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="data-table" id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>Full Name</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Agreements</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Email Settings Tab -->
+                <div id="tab-email" style="display:none">
+                    <!-- Email Sub-tabs -->
+                    <div class="email-sub-tabs" id="email-sub-tabs">
+                        <button class="email-sub-tab active" data-subtab="send" onclick="switchEmailSubTab('send')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                style="width:16px;height:16px">
+                                <path d="M22 2L11 13" />
+                                <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+                            </svg>
+                            Send Email
+                        </button>
+                        <button class="email-sub-tab" data-subtab="credentials"
+                            onclick="switchEmailSubTab('credentials')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                style="width:16px;height:16px">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0110 0v4" />
+                            </svg>
+                            Credentials
+                        </button>
+                    </div>
+
+                    <!-- ======================== -->
+                    <!-- SEND EMAIL SUB-TAB -->
+                    <!-- ======================== -->
+                    <div id="subtab-send">
+                        <!-- Company Selection -->
+                        <div class="email-settings-section">
+                            <div class="section-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    style="width:18px;height:18px">
+                                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 00-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 010 7.75" />
+                                </svg>
+                                Select Companies to Send Payment Reminders
+                                <span
+                                    style="font-weight:400;font-size:0.78rem;color:var(--color-text-muted);margin-left:auto"
+                                    id="company-count-label"></span>
+                            </div>
+
+                            <!-- Select All + Send Bar -->
+                            <div class="company-action-bar" id="company-action-bar" style="display:none">
+                                <label class="company-select-all-label">
+                                    <input type="checkbox" id="select-all-companies" onchange="toggleSelectAll()"
+                                        class="company-checkbox">
+                                    <span>Select All</span>
+                                </label>
+                                <div style="display:flex;align-items:center;gap:12px">
+                                    <span class="company-selected-count" id="selected-count">0 selected</span>
+                                    <button class="btn btn-primary btn-sm" id="send-emails-btn"
+                                        onclick="sendSelectedEmails()" disabled>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            style="width:15px;height:15px">
+                                            <path d="M22 2L11 13" />
+                                            <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+                                        </svg>
+                                        Send Email
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Company Table -->
+                            <div style="overflow-x:auto">
+                                <table class="company-select-table" id="company-select-table" style="display:none">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:40px"></th>
+                                            <th>Company Name</th>
+                                            <th>Payment Due Date</th>
+                                            <th>Net Amount</th>
+                                            <th>Email</th>
+                                            <th style="width:90px">More Info</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="company-select-tbody"></tbody>
+                                </table>
+                            </div>
+
+                            <!-- Loading State -->
+                            <div id="company-loading"
+                                style="text-align:center;padding:40px;color:var(--color-text-muted)">
+                                <div class="loading-spinner" style="margin:0 auto 12px"></div>
+                                Loading companies...
+                            </div>
+
+                            <!-- Empty State -->
+                            <div id="company-empty" style="display:none;text-align:center;padding:48px 24px">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="1.5"
+                                    style="width:48px;height:48px;margin-bottom:12px;opacity:0.5">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                </svg>
+                                <p style="color:var(--color-text-muted);font-size:0.9rem;font-weight:500">No companies
+                                    with upcoming payments</p>
+                                <p style="color:var(--color-text-muted);font-size:0.8rem;margin-top:4px">Companies with
+                                    pending payments due within 60 days will appear here</p>
+                            </div>
+                        </div>
+
+                        <!-- Email Logs -->
+                        <div class="email-settings-section" style="margin-top:24px">
+                            <div class="section-title"
+                                style="display:flex;align-items:center;justify-content:space-between">
+                                <div style="display:flex;align-items:center;gap:8px">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                        style="width:18px;height:18px">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                        <path d="M14 2v6h6" />
+                                        <path d="M16 13H8M16 17H8" />
+                                    </svg>
+                                    Email Send History
+                                </div>
+                                <button class="btn btn-sm btn-danger" id="clear-all-logs-btn"
+                                    onclick="clearAllEmailLogs()" style="font-size:0.75rem;padding:4px 10px">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        style="width:12px;height:12px">
+                                        <path
+                                            d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                    </svg>
+                                    Clear All
+                                </button>
+                            </div>
+                            <div style="overflow-x:auto">
+                                <table class="email-log-table" id="email-log-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Recipient</th>
+                                            <th>Company</th>
+                                            <th>Subject</th>
+                                            <th>Status</th>
+                                            <th style="width:40px"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="email-log-tbody">
+                                        <tr>
+                                            <td colspan="6"
+                                                style="text-align:center;color:var(--color-text-muted);padding:24px">No
+                                                emails sent yet</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ======================== -->
+                    <!-- CREDENTIALS SUB-TAB -->
+                    <!-- ======================== -->
+                    <div id="subtab-credentials" style="display:none">
+                        <!-- Gmail Credentials -->
+                        <div class="email-settings-section">
+                            <div class="section-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    style="width:18px;height:18px">
+                                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                                    <path d="M22 7l-10 7L2 7" />
+                                </svg>
+                                Gmail OAuth2 Credentials
+                            </div>
+                            <div class="email-settings-grid">
+                                <div class="form-group">
+                                    <label>Sender Email</label>
+                                    <input type="email" class="form-input" id="email-sender"
+                                        placeholder="your.email@gmail.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Client ID</label>
+                                    <input type="text" class="form-input" id="email-client-id"
+                                        placeholder="Gmail OAuth2 Client ID">
+                                </div>
+                                <div class="form-group">
+                                    <label>Client Secret</label>
+                                    <div class="password-input-wrapper">
+                                        <input type="password" class="form-input" id="email-client-secret"
+                                            placeholder="Gmail OAuth2 Client Secret">
+                                        <button type="button" class="password-toggle"
+                                            onclick="togglePasswordVisibility('email-client-secret', this)"
+                                            title="Show">
+                                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="1.8" style="width:18px;height:18px">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                            <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="1.8"
+                                                style="width:18px;height:18px;display:none">
+                                                <path
+                                                    d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                                                <line x1="1" y1="1" x2="23" y2="23" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Refresh Token</label>
+                                    <div class="password-input-wrapper">
+                                        <input type="password" class="form-input" id="email-refresh-token"
+                                            placeholder="Gmail OAuth2 Refresh Token">
+                                        <button type="button" class="password-toggle"
+                                            onclick="togglePasswordVisibility('email-refresh-token', this)"
+                                            title="Show">
+                                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="1.8" style="width:18px;height:18px">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                <circle cx="12" cy="12" r="3" />
+                                            </svg>
+                                            <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="1.8"
+                                                style="width:18px;height:18px;display:none">
+                                                <path
+                                                    d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                                                <line x1="1" y1="1" x2="23" y2="23" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>CC Emails (optional, comma-separated)</label>
+                                    <input type="text" class="form-input" id="email-cc"
+                                        placeholder="cc1@example.com, cc2@example.com">
+                                </div>
+                            </div>
+                            <div class="email-actions" style="margin-top:16px">
+                                <button class="btn btn-primary" id="save-credentials-btn" onclick="saveCredentials()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        style="width:15px;height:15px">
+                                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                                        <polyline points="17 21 17 13 7 13 7 21" />
+                                        <polyline points="7 3 7 8 15 8" />
+                                    </svg>
+                                    Save Credentials
+                                </button>
+                                <button class="btn btn-secondary" onclick="sendTestEmail()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        style="width:15px;height:15px">
+                                        <path d="M22 2L11 13" />
+                                        <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+                                    </svg>
+                                    Send Test Email
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Default Email Template -->
+                        <div class="email-settings-section">
+                            <div class="section-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                    style="width:18px;height:18px">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                    <path d="M14 2v6h6" />
+                                    <path d="M16 13H8M16 17H8M10 9H8" />
+                                </svg>
+                                Default Email Template
+                            </div>
+
+                            <!-- Email Subject -->
+                            <div class="form-group">
+                                <label>Subject line (supports {{variables}})</label>
+                                <input type="text" class="form-input" id="email-subject"
+                                    placeholder="Payment Reminder — {{company_name}}">
+                            </div>
+
+                            <div class="template-type-toggle">
+                                <button class="template-type-btn active" data-type="text"
+                                    onclick="switchTemplateType('text')">Visual</button>
+                                <button class="template-type-btn" data-type="html"
+                                    onclick="switchTemplateType('html')">HTML</button>
+                            </div>
+
+                            <!-- Rich text editor (visual mode) -->
+                            <div id="email-template-text-wrapper" class="rich-text-editor-wrapper">
+                                <div class="editor-toolbar" id="editor-toolbar">
+                                    <button type="button" class="editor-toolbar-btn" onclick="execCmd('bold')"
+                                        title="Bold"><b>B</b></button>
+                                    <button type="button" class="editor-toolbar-btn" onclick="execCmd('italic')"
+                                        title="Italic"><i>I</i></button>
+                                    <button type="button" class="editor-toolbar-btn" onclick="execCmd('underline')"
+                                        title="Underline"><u>U</u></button>
+                                    <div class="editor-toolbar-separator"></div>
+                                    <button type="button" class="editor-toolbar-btn"
+                                        onclick="execCmd('insertUnorderedList')" title="Bullet List">•</button>
+                                    <button type="button" class="editor-toolbar-btn"
+                                        onclick="execCmd('insertOrderedList')" title="Numbered List">1.</button>
+                                    <div class="editor-toolbar-separator"></div>
+                                    <button type="button" class="editor-toolbar-btn" onclick="insertLink()"
+                                        title="Insert Link">🔗</button>
+                                    <button type="button" class="editor-toolbar-btn" onclick="execCmd('removeFormat')"
+                                        title="Clear Formatting">✘</button>
+                                    <div class="editor-toolbar-separator"></div>
+                                    <button type="button" class="editor-toolbar-btn" onclick="execCmd('undo')"
+                                        title="Undo">↩</button>
+                                    <button type="button" class="editor-toolbar-btn" onclick="execCmd('redo')"
+                                        title="Redo">↪</button>
+                                </div>
+                                <div class="rich-text-editor" id="email-template-text" contenteditable="true"
+                                    data-placeholder="Enter your email template here... Use {{variables}} for dynamic content. You can paste formatted content from Gmail.">
+                                </div>
+                            </div>
+
+                            <!-- HTML code editor (html mode) -->
+                            <textarea class="template-editor" id="email-template-html"
+                                placeholder="Paste your HTML template here..." style="display:none"></textarea>
+
+                            <!-- HTML Preview (html mode only) -->
+                            <div id="html-preview-section" style="display:none;margin-top:12px">
+                                <div
+                                    style="font-size:0.85rem;font-weight:600;margin-bottom:6px;color:var(--color-text-secondary)">
+                                    HTML Preview</div>
+                                <iframe id="html-preview-frame"
+                                    style="width:100%;min-height:250px;border:1px solid var(--color-border);border-radius:var(--radius);background:white"
+                                    sandbox="allow-same-origin"></iframe>
+                            </div>
+
+                            <div class="template-variables">
+                                <h4>Available Variables</h4>
+                                <div>
+                                    <code>{{company_name}}</code>
+                                    <code>{{payment_amount}}</code>
+                                    <code>{{payment_due_date}}</code>
+                                    <code>{{days_remaining}}</code>
+                                    <code>{{currency}}</code>
+                                    <code>{{agreement_title}}</code>
+                                    <code>{{contact_person}}</code>
+                                </div>
+                            </div>
+
+                            <div class="email-actions" style="margin-top:16px">
+                                <button class="btn btn-primary" id="save-template-btn" onclick="saveTemplate()">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        style="width:15px;height:15px">
+                                        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                                        <polyline points="17 21 17 13 7 13 7 21" />
+                                        <polyline points="7 3 7 8 15 8" />
+                                    </svg>
+                                    Save Default Email Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal-overlay" id="reset-modal">
+        <div class="modal">
+            <h3 class="modal-title">Reset Password</h3>
+            <div class="modal-body">
+                <p style="margin-bottom:12px" id="reset-user-label">Set a new password for this user.</p>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" class="form-input" id="reset-password"
+                        placeholder="Enter new password (min 6 chars)" minlength="6">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitPasswordReset()">Reset Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal-overlay" id="create-user-modal">
+        <div class="modal">
+            <h3 class="modal-title">Create New User</h3>
+            <div class="modal-body">
+                <p style="margin-bottom:16px;color:var(--color-text-secondary);font-size:0.85rem">Create a new user
+                    account. Only @dvconsulting.co.in emails are allowed.</p>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-input" id="create-email" placeholder="user@dvconsulting.co.in"
+                        required>
+                    <span class="field-error" id="create-email-error"></span>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-input" id="create-fullname" placeholder="Enter full name" required>
+                    <span class="field-error" id="create-fullname-error"></span>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" class="form-input" id="create-password" placeholder="Min 6 characters"
+                            required minlength="6">
+                        <button type="button" class="password-toggle"
+                            onclick="togglePasswordVisibility('create-password', this)" title="Show password">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" style="width:18px;height:18px">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" style="width:18px;height:18px;display:none">
+                                <path
+                                    d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                                <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                        </button>
+                    </div>
+                    <span class="field-error" id="create-password-error"></span>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select class="form-input" id="create-role" onchange="toggleCreatePaymentAccess()">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group" id="create-payment-access-group" style="display:block">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                        <input type="checkbox" id="create-payment-access"
+                            style="width:16px;height:16px;cursor:pointer;accent-color:var(--color-primary)">
+                        <span>Advanced Payment Access</span>
+                    </label>
+                    <span style="font-size:0.78rem;color:var(--color-text-muted);margin-top:4px;display:block">
+                        Grant access to view all users' payment sections
+                    </span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCreateUserModal()">Cancel</button>
+                <button class="btn btn-primary" id="create-user-btn" onclick="submitCreateUser()">Create User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal-overlay" id="edit-user-modal">
+        <div class="modal">
+            <h3 class="modal-title">Edit User Credentials</h3>
+            <div class="modal-body">
+                <p style="margin-bottom:16px;color:var(--color-text-secondary);font-size:0.85rem" id="edit-user-label">
+                    Update user email, name, or password.</p>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-input" id="edit-email" placeholder="user@dvconsulting.co.in">
+                    <span class="field-error" id="edit-email-error"></span>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-input" id="edit-fullname" placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label>New Password <span style="color:var(--color-text-muted);font-weight:400">(leave empty to keep
+                            current)</span></label>
+                    <div class="password-input-wrapper">
+                        <input type="password" class="form-input" id="edit-password"
+                            placeholder="Enter new password (optional)">
+                        <button type="button" class="password-toggle"
+                            onclick="togglePasswordVisibility('edit-password', this)" title="Show password">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" style="width:18px;height:18px">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8" style="width:18px;height:18px;display:none">
+                                <path
+                                    d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                                <line x1="1" y1="1" x2="23" y2="23" />
+                            </svg>
+                        </button>
+                    </div>
+                    <span class="field-error" id="edit-password-error"></span>
+                </div>
+                <div class="form-group" id="edit-payment-access-group" style="display:none">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                        <input type="checkbox" id="edit-payment-access"
+                            style="width:16px;height:16px;cursor:pointer;accent-color:var(--color-primary)">
+                        <span>Advanced Payment Access</span>
+                    </label>
+                    <span style="font-size:0.78rem;color:var(--color-text-muted);margin-top:4px;display:block">
+                        Grant access to view all users' payment sections
+                    </span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+                <button class="btn btn-primary" id="edit-user-btn" onclick="submitEditUser()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+        if (!Auth.requireAuth()) throw new Error('Not authenticated');
+
+        const user = Auth.getUser();
+        if (user.role !== 'admin') {
+            window.location.href = '/dashboard';
+            throw new Error('Not admin');
+        }
+
+        let allUsers = [];
+        let resetUserId = null;
+
+        function initUI() {
+            document.getElementById('user-name').textContent = user.full_name;
+            document.getElementById('user-role').textContent = user.role;
+            document.getElementById('user-avatar').textContent = user.full_name.charAt(0).toUpperCase();
+        }
+
+        async function loadDashboard() {
+            try {
+                const data = await api.get('/admin/dashboard');
+                const s = data.stats;
+
+                document.getElementById('admin-stats').innerHTML = `
+                    <div class="stat-card accent">
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-value">${s.total_users}</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-label">Active Agreements</div>
+                        <div class="stat-value">${s.active_agreements}</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-label">Pending Agreements</div>
+                        <div class="stat-value">${s.pending_agreements}</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-label">Expired Agreements</div>
+                        <div class="stat-value">${s.expired_agreements}</div>
+                    </div>
+                    <div class="stat-card accent">
+                        <div class="stat-label">Total Agreements</div>
+                        <div class="stat-value">${s.total_agreements}</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-label">Pending Payments</div>
+                        <div class="stat-value">${s.pending_payments}</div>
+                    </div>
+                `;
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const data = await api.get('/admin/users');
+                allUsers = data.users || [];
+                renderUsers();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('users-tbody');
+            const currentUserId = user.id;
+            tbody.innerHTML = allUsers.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td><strong>${u.email}</strong></td>
+                    <td>${u.full_name}</td>
+                    <td><span class="badge ${u.role === 'admin' ? 'badge-active' : 'badge-pending'}">${u.role}</span></td>
+                    <td><span class="badge ${u.is_active ? 'badge-active' : 'badge-expired'}">${u.is_active ? 'Active' : 'Disabled'}</span></td>
+                    <td>${u.agreement_count}</td>
+                    <td>${formatDate(u.created_at)}</td>
+                    <td>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+                            ${u.id !== currentUserId ? `
+                                <button class="btn btn-sm btn-secondary" onclick="openEditUserModal(${u.id}, '${escapeAttr(u.email)}', '${escapeAttr(u.full_name)}', '${escapeAttr(u.role)}', ${u.global_payment_access ? 1 : 0})" title="Edit credentials">
+                                    Edit
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="toggleUserStatus(${u.id}, ${u.is_active})" title="${u.is_active ? 'Disable' : 'Enable'} user">
+                                    ${u.is_active ? 'Disable' : 'Enable'}
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id}, '${escapeAttr(u.email)}')" title="Delete user">
+                                    Delete
+                                </button>
+                            ` : '<span style="color:var(--color-text-muted);font-size:0.8rem">Current user</span>'}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function escapeAttr(str) {
+            return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        async function toggleUserStatus(userId, currentActive) {
+            try {
+                await api.put(`/admin/users/${userId}`, { is_active: !currentActive });
+                showToast(`User ${currentActive ? 'disabled' : 'enabled'} successfully`, 'success');
+                loadUsers();
+                loadDashboard();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        async function deleteUser(userId, username) {
+            const confirmed = await showConfirm(
+                'Delete User',
+                `Are you sure you want to delete user "${username}"? This will also remove all their agreements and data. This cannot be undone.`
+            );
+            if (!confirmed) return;
+
+            try {
+                await api.delete(`/admin/users/${userId}`);
+                showToast('User deleted successfully', 'success');
+                loadUsers();
+                loadDashboard();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        async function toggleGlobalPaymentAccess(userId, enabled) {
+            try {
+                await api.put(`/admin/users/${userId}`, { global_payment_access: enabled });
+                showToast(`Global payment access ${enabled ? 'granted' : 'revoked'}`, 'success');
+                loadUsers();
+            } catch (err) {
+                showToast(err.message, 'error');
+                loadUsers(); // Revert UI
+            }
+        }
+
+        function openResetModal(userId, username) {
+            resetUserId = userId;
+            document.getElementById('reset-user-label').textContent = `Set a new password for "${username}".`;
+            document.getElementById('reset-password').value = '';
+            document.getElementById('reset-modal').classList.add('open');
+        }
+
+        function closeResetModal() {
+            document.getElementById('reset-modal').classList.remove('open');
+            resetUserId = null;
+        }
+
+        async function submitPasswordReset() {
+            const newPassword = document.getElementById('reset-password').value;
+            if (newPassword.length < 6) {
+                showToast('Password must be at least 6 characters', 'warning');
+                return;
+            }
+
+            try {
+                await api.put(`/admin/users/${resetUserId}/reset-password`, { new_password: newPassword });
+                showToast('Password reset successfully', 'success');
+                closeResetModal();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Close reset modal on outside click
+        document.getElementById('reset-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'reset-modal') closeResetModal();
+        });
+
+        // ========================
+        // Create User
+        // ========================
+        function openCreateUserModal() {
+            document.getElementById('create-email').value = '';
+            document.getElementById('create-fullname').value = '';
+            document.getElementById('create-password').value = '';
+            document.getElementById('create-password').type = 'password';
+            document.getElementById('create-role').value = 'user';
+            document.getElementById('create-payment-access').checked = false;
+            document.querySelectorAll('#create-user-modal .field-error').forEach(el => el.textContent = '');
+            // Reset password visibility toggle icons
+            const createPwBtn = document.querySelector('#create-user-modal .password-toggle');
+            if (createPwBtn) {
+                createPwBtn.querySelector('.eye-icon').style.display = 'block';
+                createPwBtn.querySelector('.eye-off-icon').style.display = 'none';
+                createPwBtn.title = 'Show password';
+            }
+            toggleCreatePaymentAccess();
+            document.getElementById('create-user-modal').classList.add('open');
+        }
+
+        function toggleCreatePaymentAccess() {
+            const role = document.getElementById('create-role').value;
+            const group = document.getElementById('create-payment-access-group');
+            if (role === 'user') {
+                group.style.display = 'block';
+            } else {
+                group.style.display = 'none';
+                document.getElementById('create-payment-access').checked = false;
+            }
+        }
+
+        function closeCreateUserModal() {
+            document.getElementById('create-user-modal').classList.remove('open');
+        }
+
+        async function submitCreateUser() {
+            const email = (document.getElementById('create-email').value || '').trim().toLowerCase();
+            const fullName = (document.getElementById('create-fullname').value || '').trim();
+            const password = document.getElementById('create-password').value;
+            const role = document.getElementById('create-role').value;
+            const globalPaymentAccess = role === 'user' && document.getElementById('create-payment-access').checked;
+
+            // Client-side validation
+            let valid = true;
+            document.querySelectorAll('#create-user-modal .field-error').forEach(el => el.textContent = '');
+
+            if (!email || !email.endsWith('@dvconsulting.co.in')) {
+                document.getElementById('create-email-error').textContent = 'Email must end with @dvconsulting.co.in';
+                valid = false;
+            }
+            if (!fullName || fullName.length < 2) {
+                document.getElementById('create-fullname-error').textContent = 'Full name is required';
+                valid = false;
+            }
+            if (!password || password.length < 6) {
+                document.getElementById('create-password-error').textContent = 'Password must be at least 6 characters';
+                valid = false;
+            }
+            if (!valid) return;
+
+            const btn = document.getElementById('create-user-btn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
+
+            try {
+                await api.post('/admin/users', { email, full_name: fullName, password, role, global_payment_access: globalPaymentAccess });
+                showToast('User created successfully', 'success');
+                closeCreateUserModal();
+                loadUsers();
+                loadDashboard();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create User';
+            }
+        }
+
+        document.getElementById('create-user-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'create-user-modal') closeCreateUserModal();
+        });
+
+        // ========================
+        // Edit User Credentials
+        // ========================
+        let editUserId = null;
+
+        function openEditUserModal(userId, email, fullName, role, globalPaymentAccess) {
+            editUserId = userId;
+            document.getElementById('edit-user-label').textContent = `Update credentials for "${email}".`;
+            document.getElementById('edit-email').value = email || '';
+            document.getElementById('edit-fullname').value = fullName || '';
+            document.getElementById('edit-password').value = '';
+            document.getElementById('edit-password').type = 'password';
+            document.querySelectorAll('#edit-user-modal .field-error').forEach(el => el.textContent = '');
+
+            // Reset password visibility toggle icons
+            const editPwBtn = document.querySelector('#edit-user-modal .password-toggle');
+            if (editPwBtn) {
+                editPwBtn.querySelector('.eye-icon').style.display = 'block';
+                editPwBtn.querySelector('.eye-off-icon').style.display = 'none';
+                editPwBtn.title = 'Show password';
+            }
+
+            // Show/hide payment access checkbox based on role
+            const paymentGroup = document.getElementById('edit-payment-access-group');
+            if (role === 'user') {
+                paymentGroup.style.display = 'block';
+                document.getElementById('edit-payment-access').checked = !!globalPaymentAccess;
+            } else {
+                paymentGroup.style.display = 'none';
+                document.getElementById('edit-payment-access').checked = false;
+            }
+
+            document.getElementById('edit-user-modal').classList.add('open');
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('edit-user-modal').classList.remove('open');
+            editUserId = null;
+        }
+
+        async function submitEditUser() {
+            const email = (document.getElementById('edit-email').value || '').trim().toLowerCase();
+            const fullName = (document.getElementById('edit-fullname').value || '').trim();
+            const password = document.getElementById('edit-password').value;
+
+            // Client-side validation
+            let valid = true;
+            document.querySelectorAll('#edit-user-modal .field-error').forEach(el => el.textContent = '');
+
+            if (email && !email.endsWith('@dvconsulting.co.in')) {
+                document.getElementById('edit-email-error').textContent = 'Email must end with @dvconsulting.co.in';
+                valid = false;
+            }
+            if (password && password.length < 6) {
+                document.getElementById('edit-password-error').textContent = 'Password must be at least 6 characters';
+                valid = false;
+            }
+            if (!valid) return;
+
+            const updateData = {};
+            if (email) updateData.email = email;
+            if (fullName) updateData.full_name = fullName;
+            if (password) updateData.password = password;
+
+            // Include payment access if the group is visible (user role)
+            const paymentGroup = document.getElementById('edit-payment-access-group');
+            if (paymentGroup.style.display !== 'none') {
+                updateData.global_payment_access = document.getElementById('edit-payment-access').checked;
+            }
+
+            if (Object.keys(updateData).length === 0) {
+                showToast('No changes to save', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('edit-user-btn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                await api.put(`/admin/users/${editUserId}/update-credentials`, updateData);
+                showToast('User credentials updated successfully', 'success');
+                closeEditUserModal();
+                loadUsers();
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Changes';
+            }
+        }
+
+        document.getElementById('edit-user-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'edit-user-modal') closeEditUserModal();
+        });
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+            document.getElementById('tab-users').style.display = tab === 'users' ? 'block' : 'none';
+            document.getElementById('tab-email').style.display = tab === 'email' ? 'block' : 'none';
+
+            if (tab === 'email') { loadCompanies(); loadEmailLogs(); }
+        }
+
+        // ========================
+        // Password Toggle
+        // ========================
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const eyeIcon = btn.querySelector('.eye-icon');
+            const eyeOffIcon = btn.querySelector('.eye-off-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.style.display = 'none';
+                eyeOffIcon.style.display = 'block';
+                btn.title = 'Hide';
+            } else {
+                input.type = 'password';
+                eyeIcon.style.display = 'block';
+                eyeOffIcon.style.display = 'none';
+                btn.title = 'Show';
+            }
+        }
+
+        // ========================
+        // Email Sub-tabs
+        // ========================
+        let currentEmailSubTab = 'send';
+        let currentTemplateType = 'text';
+        let textTemplate = '';
+        let htmlTemplate = '';
+        let companiesList = [];
+        let selectedCompanies = new Set();
+
+        function switchEmailSubTab(tab) {
+            currentEmailSubTab = tab;
+            document.querySelectorAll('.email-sub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-subtab="${tab}"]`).classList.add('active');
+
+            document.getElementById('subtab-send').style.display = tab === 'send' ? 'block' : 'none';
+            document.getElementById('subtab-credentials').style.display = tab === 'credentials' ? 'block' : 'none';
+
+            if (tab === 'send') {
+                loadCompanies();
+                loadEmailLogs();
+            } else if (tab === 'credentials') {
+                loadEmailSettings();
+            }
+        }
+
+        // ========================
+        // Load Settings (Credentials + Template)
+        // ========================
+        async function loadEmailSettings() {
+            try {
+                const data = await api.get('/email/settings');
+                const s = data.settings;
+                document.getElementById('email-sender').value = s.sender_email || '';
+                document.getElementById('email-client-id').value = s.gmail_client_id || '';
+                document.getElementById('email-client-secret').value = s.gmail_client_secret || '';
+                document.getElementById('email-refresh-token').value = s.gmail_refresh_token || '';
+                document.getElementById('email-cc').value = s.cc_emails || '';
+                document.getElementById('email-subject').value = s.email_subject || 'Payment Reminder — {{company_name}}';
+
+                // Load both templates separately
+                textTemplate = s.email_template || '';
+                htmlTemplate = s.email_template_html || '';
+
+                currentTemplateType = s.email_template_type || 'text';
+                switchTemplateType(currentTemplateType);
+            } catch (err) {
+                // Settings not configured yet — that's fine
+            }
+        }
+
+        // ========================
+        // Company Selection (Send Email Sub-tab)
+        // ========================
+        async function loadCompanies() {
+            const loading = document.getElementById('company-loading');
+            const empty = document.getElementById('company-empty');
+            const table = document.getElementById('company-select-table');
+            const actionBar = document.getElementById('company-action-bar');
+
+            loading.style.display = 'block';
+            empty.style.display = 'none';
+            table.style.display = 'none';
+            actionBar.style.display = 'none';
+
+            try {
+                const data = await api.get('/email/companies');
+                companiesList = data.companies || [];
+                selectedCompanies.clear();
+
+                loading.style.display = 'none';
+
+                if (companiesList.length === 0) {
+                    empty.style.display = 'block';
+                    document.getElementById('company-count-label').textContent = '';
+                    return;
+                }
+
+                // Count total individual payments
+                let totalPayments = 0;
+                companiesList.forEach(c => totalPayments += (c.payments || []).length);
+                const companyCount = companiesList.length;
+                document.getElementById('company-count-label').textContent = `${totalPayments} ${totalPayments === 1 ? 'payment' : 'payments'} across ${companyCount} ${companyCount === 1 ? 'company' : 'companies'}`;
+                actionBar.style.display = 'flex';
+                table.style.display = 'table';
+                renderCompanyList();
+            } catch (err) {
+                loading.style.display = 'none';
+                empty.style.display = 'block';
+                document.getElementById('company-count-label').textContent = '';
+                showToast(err.message || 'Failed to load companies', 'error');
+            }
+        }
+
+        function renderCompanyList() {
+            const tbody = document.getElementById('company-select-tbody');
+            const now = new Date();
+
+            // Flatten companies into individual payment rows
+            const flatRows = [];
+            companiesList.forEach((c, companyIndex) => {
+                (c.payments || []).forEach(p => {
+                    flatRows.push({
+                        agreement_id: c.agreement_id,
+                        company_name: c.company_name,
+                        agreement_title: c.agreement_title,
+                        email: c.email,
+                        currency: c.currency || '₹',
+                        companyIndex: companyIndex,
+                        payment_id: p.payment_id,
+                        due_date: p.due_date,
+                        net_amount: p.net_amount || p.amount || 0,
+                    });
+                });
+            });
+
+            // Sort all payment rows by due_date ascending
+            flatRows.sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''));
+
+            tbody.innerHTML = flatRows.map(row => {
+                const isSelected = selectedCompanies.has(row.payment_id);
+                const dueDate = new Date(row.due_date);
+                const daysLeft = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+
+                // Urgency styling
+                let dueDateClass = '';
+                let dueDateBadge = '';
+                if (daysLeft <= 2) {
+                    dueDateClass = 'company-due-urgent';
+                    dueDateBadge = `<span class="company-due-badge urgent">${daysLeft <= 0 ? 'Due today' : daysLeft + 'd left'}</span>`;
+                } else if (daysLeft <= 7) {
+                    dueDateClass = 'company-due-warning';
+                    dueDateBadge = `<span class="company-due-badge warning">${daysLeft}d left</span>`;
+                } else {
+                    dueDateBadge = `<span class="company-due-badge normal">${daysLeft}d left</span>`;
+                }
+
+                return `
+                    <tr class="${isSelected ? 'company-row-selected' : ''} ${dueDateClass}" data-pid="${row.payment_id}" data-aid="${row.agreement_id}">
+                        <td>
+                            <input type="checkbox" class="company-checkbox" ${isSelected ? 'checked' : ''}
+                                onchange="toggleCompanySelect(${row.payment_id})">
+                        </td>
+                        <td>
+                            <div style="font-weight:600;color:var(--color-text-primary)">${row.company_name || 'Unknown'}</div>
+                            <div style="font-size:0.75rem;color:var(--color-text-muted)">${row.agreement_title || ''}</div>
+                        </td>
+                        <td>
+                            <div>${formatDate(row.due_date)}</div>
+                            ${dueDateBadge}
+                        </td>
+                        <td>
+                            <strong>${row.currency}${row.net_amount ? row.net_amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}</strong>
+                        </td>
+                        <td>
+                            <input type="email" class="form-input company-email-input" data-aid="${row.agreement_id}"
+                                value="${row.email || ''}" placeholder="Enter email address"
+                                onchange="updateCompanyEmail(${row.companyIndex}, this.value, ${row.agreement_id})">
+                        </td>
+                        <td>
+                            <a href="/agreement/${row.agreement_id}" class="btn btn-sm btn-secondary company-more-info-btn" title="View Agreement">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                Info
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateSelectionUI();
+        }
+
+        function toggleCompanySelect(paymentId) {
+            if (selectedCompanies.has(paymentId)) {
+                selectedCompanies.delete(paymentId);
+            } else {
+                selectedCompanies.add(paymentId);
+            }
+            updateSelectionUI();
+            // Update only the single row for this payment
+            const isSelected = selectedCompanies.has(paymentId);
+            const row = document.querySelector(`tr[data-pid="${paymentId}"]`);
+            if (row) {
+                row.classList.toggle('company-row-selected', isSelected);
+                const cb = row.querySelector('.company-checkbox');
+                if (cb) cb.checked = isSelected;
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAllCb = document.getElementById('select-all-companies');
+            if (selectAllCb.checked) {
+                companiesList.forEach(c => {
+                    (c.payments || []).forEach(p => selectedCompanies.add(p.payment_id));
+                });
+            } else {
+                selectedCompanies.clear();
+            }
+            // Update all checkboxes
+            document.querySelectorAll('.company-checkbox:not(#select-all-companies)').forEach(cb => {
+                cb.checked = selectAllCb.checked;
+            });
+            // Update row highlights
+            document.querySelectorAll('#company-select-tbody tr').forEach(row => {
+                row.classList.toggle('company-row-selected', selectAllCb.checked);
+            });
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            const count = selectedCompanies.size;
+            document.getElementById('selected-count').textContent = `${count} selected`;
+            document.getElementById('send-emails-btn').disabled = count === 0;
+
+            // Update select-all checkbox state
+            const selectAllCb = document.getElementById('select-all-companies');
+            const totalPayments = companiesList.reduce((sum, c) => sum + (c.payments || []).length, 0);
+            if (totalPayments > 0) {
+                selectAllCb.checked = count === totalPayments;
+                selectAllCb.indeterminate = count > 0 && count < totalPayments;
+            }
+        }
+
+        function updateCompanyEmail(companyIndex, newEmail, agreementId) {
+            if (companyIndex >= 0 && companyIndex < companiesList.length) {
+                companiesList[companyIndex].email = newEmail.trim();
+            }
+            // Sync email value across all rows for the same company
+            document.querySelectorAll(`input.company-email-input[data-aid="${agreementId}"]`).forEach(input => {
+                input.value = newEmail.trim();
+            });
+        }
+
+        // ========================
+        // Send Emails to Selected Companies
+        // ========================
+        async function sendSelectedEmails() {
+            if (selectedCompanies.size === 0) {
+                showToast('Please select at least one company', 'warning');
+                return;
+            }
+
+            // Validate emails
+            const companiesPayload = [];
+            let missingEmails = [];
+
+            companiesList.forEach(c => {
+                // Only include payments that are individually selected
+                const selectedPaymentIds = (c.payments || [])
+                    .filter(p => selectedCompanies.has(p.payment_id))
+                    .map(p => p.payment_id);
+                if (selectedPaymentIds.length === 0) return;
+
+                const email = (c.email || '').trim();
+
+                if (!email) {
+                    missingEmails.push(c.company_name || 'Unknown');
+                    return;
+                }
+
+                companiesPayload.push({
+                    agreement_id: c.agreement_id,
+                    email: email,
+                    payment_ids: selectedPaymentIds
+                });
+            });
+
+            if (missingEmails.length > 0) {
+                showToast(`Missing email for: ${missingEmails.join(', ')}. Please enter email addresses.`, 'warning');
+                return;
+            }
+
+            if (companiesPayload.length === 0) {
+                showToast('No valid companies to send to', 'warning');
+                return;
+            }
+
+            const confirmed = await showConfirm(
+                'Send Payment Reminders',
+                `Are you sure you want to send payment reminder emails to ${companiesPayload.length} ${companiesPayload.length === 1 ? 'company' : 'companies'}?`
+            );
+            if (!confirmed) return;
+
+            const btn = document.getElementById('send-emails-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner" style="width:14px;height:14px;border-width:2px;display:inline-block"></div> Sending...';
+
+            try {
+                const result = await api.post('/email/send', { companies: companiesPayload });
+                const stats = result.stats;
+
+                if (stats.sent > 0 && stats.failed === 0) {
+                    showToast(`Successfully sent ${stats.sent} ${stats.sent === 1 ? 'email' : 'emails'}`, 'success');
+                } else if (stats.sent > 0 && stats.failed > 0) {
+                    showToast(`Sent ${stats.sent}, Failed ${stats.failed}. Check errors below.`, 'warning');
+                } else {
+                    showToast(`Failed to send emails: ${stats.errors.join('; ')}`, 'error');
+                }
+
+                // Reload companies and logs
+                selectedCompanies.clear();
+                await loadCompanies();
+                loadEmailLogs();
+            } catch (err) {
+                showToast(err.message || 'Failed to send emails', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg> Send Email`;
+            }
+        }
+
+        // ========================
+        // Rich Text Editor Commands
+        // ========================
+        function execCmd(command) {
+            document.getElementById('email-template-text').focus();
+            document.execCommand(command, false, null);
+        }
+
+        function insertLink() {
+            const url = prompt('Enter URL:', 'https://');
+            if (url) {
+                document.getElementById('email-template-text').focus();
+                document.execCommand('createLink', false, url);
+            }
+        }
+
+        // ========================
+        // Template Type Switching
+        // ========================
+        function switchTemplateType(type) {
+            // Save current content before switching
+            if (currentTemplateType === 'text' && type !== 'text') {
+                textTemplate = document.getElementById('email-template-text').innerHTML || '';
+            } else if (currentTemplateType === 'html' && type !== 'html') {
+                htmlTemplate = document.getElementById('email-template-html').value || '';
+            }
+
+            currentTemplateType = type;
+            document.querySelectorAll('.template-type-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.type === type);
+            });
+
+            const textWrapper = document.getElementById('email-template-text-wrapper');
+            const htmlEditor = document.getElementById('email-template-html');
+            const previewSection = document.getElementById('html-preview-section');
+
+            if (type === 'html') {
+                // Show HTML editor, hide text editor
+                textWrapper.style.display = 'none';
+                htmlEditor.style.display = 'block';
+                htmlEditor.value = htmlTemplate;
+                previewSection.style.display = 'block';
+                updateHtmlPreview();
+            } else {
+                // Show visual editor, hide HTML
+                textWrapper.style.display = 'block';
+                document.getElementById('email-template-text').innerHTML = textTemplate;
+                htmlEditor.style.display = 'none';
+                previewSection.style.display = 'none';
+            }
+        }
+
+        // ========================
+        // HTML Preview
+        // ========================
+        function updateHtmlPreview() {
+            const frame = document.getElementById('html-preview-frame');
+            const html = document.getElementById('email-template-html').value || '';
+            try {
+                const doc = frame.contentDocument || frame.contentWindow.document;
+                doc.open();
+                doc.write(html || '<p style="color:#999;padding:20px;font-family:sans-serif">HTML preview will appear here...</p>');
+                doc.close();
+            } catch (e) {
+                // Silently ignore preview errors
+            }
+        }
+
+        // Live HTML preview updates
+        document.getElementById('email-template-html').addEventListener('input', () => {
+            htmlTemplate = document.getElementById('email-template-html').value || '';
+            updateHtmlPreview();
+        });
+
+        // Paste Auto-Detection
+        document.getElementById('email-template-html').addEventListener('paste', (e) => {
+            setTimeout(() => {
+                htmlTemplate = document.getElementById('email-template-html').value || '';
+                updateHtmlPreview();
+            }, 50);
+        });
+
+        // ========================
+        // Save Credentials (separate)
+        // ========================
+        async function saveCredentials() {
+            const btn = document.getElementById('save-credentials-btn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                await api.put('/email/credentials', {
+                    gmail_client_id: document.getElementById('email-client-id').value.trim(),
+                    gmail_client_secret: document.getElementById('email-client-secret').value,
+                    gmail_refresh_token: document.getElementById('email-refresh-token').value,
+                    sender_email: document.getElementById('email-sender').value.trim(),
+                    cc_emails: document.getElementById('email-cc').value.trim(),
+                });
+                showToast('Credentials saved successfully', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Credentials`;
+            }
+        }
+
+        // ========================
+        // Save Default Email Template (separate)
+        // ========================
+        async function saveTemplate() {
+            const btn = document.getElementById('save-template-btn');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            // Capture current editor content
+            if (currentTemplateType === 'text') {
+                textTemplate = document.getElementById('email-template-text').innerHTML || '';
+            } else {
+                htmlTemplate = document.getElementById('email-template-html').value || '';
+            }
+
+            try {
+                await api.put('/email/template', {
+                    email_subject: document.getElementById('email-subject').value.trim(),
+                    email_template_type: currentTemplateType,
+                    email_template: textTemplate,
+                    email_template_html: htmlTemplate,
+                });
+                showToast('Default email template saved successfully', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Default Email Template`;
+            }
+        }
+
+        // ========================
+        // Test Email
+        // ========================
+        async function sendTestEmail() {
+            const senderEmail = document.getElementById('email-sender').value.trim();
+            if (!senderEmail) {
+                showToast('Please save credentials first before sending a test', 'warning');
+                return;
+            }
+
+            // Auto-save credentials before sending test
+            await saveCredentials();
+
+            const testRecipient = prompt('Enter the email address to send a test email to:', senderEmail);
+            if (!testRecipient) return;
+
+            try {
+                const result = await api.post('/email/test', { recipient_email: testRecipient.trim() });
+                showToast(result.message, 'success');
+            } catch (err) {
+                showToast(err.message || 'Failed to send test email', 'error');
+            }
+        }
+
+        // ========================
+        // Email Logs
+        // ========================
+        async function loadEmailLogs() {
+            try {
+                const data = await api.get('/email/logs');
+                const logs = data.logs || [];
+                const tbody = document.getElementById('email-log-tbody');
+                const clearBtn = document.getElementById('clear-all-logs-btn');
+
+                if (logs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:24px">No emails sent yet</td></tr>';
+                    clearBtn.style.display = 'none';
+                    return;
+                }
+
+                clearBtn.style.display = '';
+
+                tbody.innerHTML = logs.map(l => `
+                    <tr>
+                        <td>${formatDate(l.sent_at)}</td>
+                        <td>${l.recipient_email || '—'}</td>
+                        <td>${l.company_name || '—'}</td>
+                        <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.subject || '—'}</td>
+                        <td><span class="badge ${l.status === 'sent' ? 'badge-active' : 'badge-expired'}">${l.status}</span></td>
+                        <td style="text-align:center">
+                            <button class="btn-ghost btn-icon" onclick="event.stopPropagation(); deleteEmailLog(${l.id})" title="Delete this entry" style="padding:4px;color:var(--color-text-muted);opacity:0.6;transition:opacity 0.15s" onmouseenter="this.style.opacity='1';this.style.color='var(--color-danger)'" onmouseleave="this.style.opacity='0.6';this.style.color='var(--color-text-muted)'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                // Silent
+            }
+        }
+
+        async function clearAllEmailLogs() {
+            const confirmed = await showConfirm(
+                'Clear Email History',
+                'Are you sure you want to delete all email send history? This action cannot be undone.'
+            );
+            if (!confirmed) return;
+
+            try {
+                await api.delete('/email/logs');
+                showToast('All email history cleared', 'success');
+                loadEmailLogs();
+            } catch (err) {
+                showToast(err.message || 'Failed to clear email history', 'error');
+            }
+        }
+
+        async function deleteEmailLog(logId) {
+            try {
+                await api.delete(`/email/logs/${logId}`);
+                loadEmailLogs();
+            } catch (err) {
+                showToast(err.message || 'Failed to delete entry', 'error');
+            }
+        }
+
+        // Mobile sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar-backdrop').classList.toggle('open');
+        }
+        document.getElementById('sidebar-backdrop').addEventListener('click', toggleSidebar);
+
+        // Init
+        initUI();
+        loadDashboard();
+        loadUsers();
+    </script>
+</body>
+
+</html>

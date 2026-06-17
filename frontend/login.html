@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Agreement Management System — Secure Login">
+    <title>Login — Agreement Management</title>
+    <link rel="icon" type="image/webp" href="/static/favicon.webp">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <div class="auth-wrapper">
+        <!-- Left Intro Panel -->
+        <div class="auth-intro">
+            <div class="auth-intro-content">
+                <div class="auth-intro-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    Agreement Management Platform
+                </div>
+                <h1>No Guesswork.<br><span>Just Systems.</span></h1>
+                <div class="auth-intro-tagline">
+                    SOP-Based Workflows <span>|</span> Real-Time Visibility <span>|</span> Full Control <span>|</span>
+                    Zero Chaos
+                </div>
+
+                <div class="auth-features-grid">
+                    <div class="auth-feature-card">
+                        <div class="auth-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" />
+                            </svg>
+                        </div>
+                        <h4>Unified Dashboard</h4>
+                        <p>Complete business overview at a glance</p>
+                    </div>
+                    <div class="auth-feature-card">
+                        <div class="auth-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                <path d="M14 2v6h6" />
+                                <path d="M16 13H8M16 17H8M10 9H8" />
+                            </svg>
+                        </div>
+                        <h4>Agreement Control</h4>
+                        <p>End-to-end agreement lifecycle tracking</p>
+                    </div>
+                    <div class="auth-feature-card">
+                        <div class="auth-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <line x1="12" y1="1" x2="12" y2="23" />
+                                <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                            </svg>
+                        </div>
+                        <h4>Payment Tracking</h4>
+                        <p>Automated payment reminders & management</p>
+                    </div>
+                    <div class="auth-feature-card">
+                        <div class="auth-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 01-3.46 0" />
+                            </svg>
+                        </div>
+                        <h4>Smart Notifications</h4>
+                        <p>Real-time alerts & renewal updates</p>
+                    </div>
+                </div>
+
+                <div class="auth-intro-footer">
+                    <div class="auth-intro-footer-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                        Enterprise Security
+                    </div>
+                    <div class="auth-intro-footer-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                        </svg>
+                        Real-time Sync
+                    </div>
+                    <div class="auth-intro-footer-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        24/7 Availability
+                    </div>
+                    <div class="auth-intro-footer-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 01-3.46 0" />
+                        </svg>
+                        Smart Notifications
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="auth-form-panel">
+            <div class="auth-form-container">
+                <div class="auth-form-logo">
+                    <img src="/static/logo.webp" alt="D&amp;V Business Consulting" style="
+    width: stretch;
+    height: 75px;
+">
+                </div>
+
+                <div class="auth-form-header">
+                    <h2>Welcome back</h2>
+                    <p>Sign in to access your Agreement Management dashboard</p>
+                </div>
+
+                <div id="login-error" class="alert alert-error" style="display:none"></div>
+
+                <form id="login-form" autocomplete="on">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-input"
+                            placeholder="Enter your @dvconsulting.co.in email" required autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="password" class="form-input" placeholder="Enter your password"
+                                required autocomplete="current-password">
+                            <button type="button" class="password-toggle"
+                                onclick="togglePasswordVisibility('password', this)" title="Show password">
+                                <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8" style="width:18px;height:18px">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                                <svg class="eye-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8" style="width:18px;height:18px;display:none">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="login-btn">Sign In</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+        // Password show/hide toggle
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const eyeIcon = btn.querySelector('.eye-icon');
+            const eyeOffIcon = btn.querySelector('.eye-off-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.style.display = 'none';
+                eyeOffIcon.style.display = 'block';
+                btn.title = 'Hide password';
+            } else {
+                input.type = 'password';
+                eyeIcon.style.display = 'block';
+                eyeOffIcon.style.display = 'none';
+                btn.title = 'Show password';
+            }
+        }
+
+        // Redirect if already logged in
+        if (Auth.isLoggedIn()) {
+            window.location.href = '/dashboard';
+        }
+
+        const form = document.getElementById('login-form');
+        const errorDiv = document.getElementById('login-error');
+        const loginBtn = document.getElementById('login-btn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorDiv.style.display = 'none';
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+
+            try {
+                const data = await api.post('/auth/login', {
+                    email: document.getElementById('email').value.trim(),
+                    password: document.getElementById('password').value
+                });
+
+                if (!data || !data.access_token) {
+                    throw new Error('Invalid response from server. Please try again.');
+                }
+
+                Auth.setToken(data.access_token);
+                Auth.setUser(data.user);
+
+                // Both admin and regular users go to dashboard
+                window.location.href = '/dashboard';
+            } catch (err) {
+                const message = (err && err.message) ? err.message : 'Login failed. Please try again.';
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+    </script>
+    <button class="custom-goto-btn" , onclick="window.open('https://lead-management-1234-production.up.railway.app/', '_blank')"
+        style="background-color: rgb(232, 160, 37); color: rgb(255, 255, 255); padding: 10px 20px; border-radius: 8px; border: 0.8px solid rgb(232, 160, 37); font-size: 13.5px; font-weight: 500; font-family: Inter, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; position: fixed; top: 20px; right: 20px; z-index: 9999;">Lead
+        Management</button>
+</body>
+
+</html>

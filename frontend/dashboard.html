@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Agreement Management Dashboard — View and manage your consulting agreements">
+    <title>Dashboard — Agreement Management</title>
+    <link rel="icon" type="image/webp" href="/static/favicon.webp">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Sidebar Backdrop (mobile) -->
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/logo.webp" alt="D&amp;V Business Consulting" style="
+    width: 169px;
+    height: 81px;
+">
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a class="nav-item active" href="/dashboard" id="nav-dashboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        Dashboard
+                    </a>
+                    <a class="nav-item" href="/payments" id="nav-payments">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                        Payments
+                    </a>
+                    <a class="nav-item" href="/renewals" id="nav-renewals">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115.36-6.36L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15.36 6.36L3 16"/></svg>
+                        Renewals
+                    </a>
+                </div>
+                <div class="nav-section" id="admin-nav-section" style="display:none">
+                    <div class="nav-section-title">Administration</div>
+                    <a class="nav-item" href="/admin" id="nav-admin">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Admin Panel
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <div class="user-details">
+                        <div class="user-name" id="user-name">User</div>
+                        <div class="user-role" id="user-role">User</div>
+                    </div>
+                    <button class="btn-ghost btn-icon" onclick="Auth.logout()" title="Logout">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="mobile-toggle" onclick="toggleSidebar()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <h1>Dashboard</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        <input type="text" id="search-input" placeholder="Search agreements...">
+                    </div>
+                    <!-- Notifications -->
+                    <div class="notification-bell" id="notification-bell" onclick="toggleNotifications()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:20px;height:20px"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                        <div class="notification-count" id="notification-count" style="display:none">0</div>
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notification-dropdown-header">
+                                <h4>Notifications</h4>
+                                <div class="notification-header-actions">
+                                    <button class="btn btn-ghost btn-sm" onclick="markAllRead(event)">Mark all read</button>
+                                    <button class="btn-clear-all" onclick="clearAllNotifications(event)" title="Delete all notifications">✕ Clear All</button>
+                                </div>
+                            </div>
+                            <div class="notification-list" id="notification-list"></div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="showUploadModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload Agreement
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-body">
+
+                <!-- Monthly Payment Summary Cards -->
+                <div class="dashboard-payment-cards" id="dashboard-payment-cards"></div>
+                <div class="filter-tabs" id="filter-tabs">
+                    <button class="filter-tab active" data-filter="">All</button>
+                    <button class="filter-tab" data-filter="active">Active</button>
+                    <button class="filter-tab" data-filter="pending">Pending</button>
+                    <button class="filter-tab" data-filter="expired">Expired</button>
+                    <button class="filter-tab" data-filter="terminated">Terminated</button>
+                </div>
+
+                <!-- Agreements Grid -->
+                <div class="agreements-grid" id="agreements-grid"></div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state" style="display:none">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;color:#9ba3b2;margin-bottom:16px">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/>
+                    </svg>
+                    <h3>No agreements found</h3>
+                    <p>Upload your first consulting agreement to get started.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="upload-modal">
+        <div class="modal" style="max-width:700px">
+            <h3 class="modal-title">Upload Agreement</h3>
+            <div class="modal-body">
+                <div class="upload-options-grid">
+                    <!-- Scanned PDF -->
+                    <div class="upload-option-card">
+                        <div class="upload-option-icon scan-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+                        </div>
+                        <h4>Scanned PDF</h4>
+                        <p>Image-based PDF with OCR text extraction</p>
+                        <span class="size-limit">Max 100 MB</span>
+                        <button class="upload-option-btn" onclick="triggerUpload('scanned')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload
+                        </button>
+                    </div>
+                    <!-- Standard PDF -->
+                    <div class="upload-option-card">
+                        <div class="upload-option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
+                        </div>
+                        <h4>Standard PDF</h4>
+                        <p>Normal text-based PDF document</p>
+                        <span class="size-limit">Max 20 MB</span>
+                        <button class="upload-option-btn" onclick="triggerUpload('standard')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload
+                        </button>
+                    </div>
+                    <!-- DOCX -->
+                    <div class="upload-option-card">
+                        <div class="upload-option-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6M9 15l3 3 3-3"/></svg>
+                        </div>
+                        <h4>Word Document</h4>
+                        <p>Microsoft Word DOCX file</p>
+                        <span class="size-limit">Max 20 MB</span>
+                        <button class="upload-option-btn" onclick="triggerUpload('docx')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload
+                        </button>
+                    </div>
+                </div>
+                <div id="upload-progress" style="margin-top:16px;display:none">
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <div class="loading-spinner"></div>
+                        <span id="upload-progress-text" style="font-size:0.85rem;color:var(--color-text-secondary)">Uploading and analyzing agreement...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Error Popup Modal -->
+    <div class="modal-overlay" id="error-popup-modal">
+        <div class="modal error-popup-modal">
+            <div class="error-popup-header">
+                <div class="error-popup-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M15 9l-6 6M9 9l6 6"/>
+                    </svg>
+                </div>
+                <button class="error-popup-close" onclick="closeErrorPopup()" title="Close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <h3 class="error-popup-title" id="error-popup-title">Upload Failed</h3>
+            <p class="error-popup-message" id="error-popup-message"></p>
+            <div class="error-popup-actions">
+                <button class="btn btn-primary" onclick="closeErrorPopup()">OK, Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+        // Auth guard
+        if (!Auth.requireAuth()) throw new Error('Not authenticated');
+
+        const user = Auth.getUser();
+        let allAgreements = [];
+        let currentFilter = '';
+
+        // Setup UI
+        function initUI() {
+            document.getElementById('user-name').textContent = user.full_name;
+            document.getElementById('user-role').textContent = user.role;
+            document.getElementById('user-avatar').textContent = user.full_name.charAt(0).toUpperCase();
+            if (user.role === 'admin') {
+                document.getElementById('admin-nav-section').style.display = 'block';
+            }
+        }
+
+        // Load payment summary for dashboard cards
+        const MONTH_FULL_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        async function loadPaymentSummary() {
+            try {
+                const data = await api.get('/payments/summary');
+                const payments = data.payments || [];
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+
+                const cards = [];
+                const iconColors = ['orange', 'green', 'amber', 'purple'];
+                const calendarIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+
+                for (let i = 0; i < 4; i++) {
+                    let m = currentMonth + i;
+                    let y = currentYear;
+                    if (m > 11) { m -= 12; y += 1; }
+
+                    const monthPending = payments
+                        .filter(p => {
+                            if (!p.due_date) return false;
+                            try {
+                                const d = new Date(p.due_date);
+                                return d.getMonth() === m && d.getFullYear() === y && p.status !== 'paid';
+                            } catch(e) { return false; }
+                        })
+                        .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+                    const currency = '₹';
+                    const label = `${MONTH_FULL_NAMES[m].toUpperCase()} ${y}`;
+
+                    cards.push(`
+                        <div class="dashboard-pay-card" onclick="window.location.href='/payments?month=${m}&year=${y}'">
+                            <div class="card-icon ${iconColors[i]}">${calendarIcon}</div>
+                            <div class="card-label">${label}</div>
+                            <div class="card-amount">${formatCurrency(monthPending, currency)}</div>
+                        </div>
+                    `);
+                }
+
+                document.getElementById('dashboard-payment-cards').innerHTML = cards.join('');
+            } catch (err) {
+                // Silent — cards just won't show
+            }
+        }
+
+        // Load agreements
+        async function loadAgreements() {
+            try {
+                const data = await api.get('/agreements/');
+                allAgreements = data.agreements || [];
+                renderAgreements();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+
+        // Render agreements grid
+        function renderAgreements() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            let filtered = allAgreements;
+
+            if (currentFilter) {
+                filtered = filtered.filter(a => a.status === currentFilter);
+            }
+
+            if (search) {
+                filtered = filtered.filter(a =>
+                    (a.company_name || '').toLowerCase().includes(search) ||
+                    (a.file_name || '').toLowerCase().includes(search) ||
+                    String(a.id).includes(search) ||
+                    (a.payment_type || '').toLowerCase().includes(search)
+                );
+            }
+
+            const grid = document.getElementById('agreements-grid');
+            const empty = document.getElementById('empty-state');
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            grid.innerHTML = filtered.map(a => {
+                // Calculate total Amount (base amount without GST/TDS) from payment_plans
+                let totalAmount = 0;
+                try {
+                    const plans = JSON.parse(a.payment_plans || '[]');
+                    if (Array.isArray(plans)) {
+                        plans.forEach(p => { totalAmount += (p.amount || 0); });
+                    }
+                } catch(e) {}
+
+                const currency = a.currency || '₹';
+
+                return `
+                <div class="agreement-card" onclick="window.location.href='/agreement/${a.id}'">
+                    ${a.is_viewed === 0 ? '<div class="badge-new">New</div>' : ''}
+                    <button class="card-remove" onclick="event.stopPropagation(); deleteAgreement(${a.id}, '${(a.company_name || a.file_name || '').replace(/'/g, "\\\'")}')" title="Remove agreement">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                    <div class="card-company">${a.company_name || a.file_name || 'Unnamed Agreement'}</div>
+                    <div>${statusBadge(a.status)}</div>
+                    <div class="card-meta">
+                        <div class="card-meta-item">
+                            <span class="card-meta-label">Start Date</span>
+                            <span class="card-meta-value">${formatDate(a.consulting_start_date)}</span>
+                        </div>
+                        <div class="card-meta-item">
+                            <span class="card-meta-label">End Date</span>
+                            <span class="card-meta-value">${formatDate(a.consulting_end_date)}</span>
+                        </div>
+                        <div class="card-meta-item">
+                            <span class="card-meta-label">Total Amount</span>
+                            <span class="card-meta-value" style="font-weight:700;color:var(--color-text-primary)">${totalAmount > 0 ? formatCurrency(totalAmount, currency) : '—'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Delete agreement
+        async function deleteAgreement(id, name) {
+            const confirmed = await showConfirm(
+                'Delete Agreement',
+                `Are you sure you want to delete the agreement "${name}"? This will remove the agreement, uploaded file, and all analysis data. This action cannot be undone.`
+            );
+            if (!confirmed) return;
+
+            try {
+                await api.delete(`/agreements/${id}`);
+                showToast('Agreement deleted successfully', 'success');
+                loadAgreements();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Filter tabs
+        document.getElementById('filter-tabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-tab')) {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                renderAgreements();
+            }
+        });
+
+        // Search
+        let searchTimeout;
+        document.getElementById('search-input').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(renderAgreements, 250);
+        });
+
+        // Upload modal
+        function showUploadModal() {
+            document.getElementById('upload-modal').classList.add('open');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('upload-modal').classList.remove('open');
+            document.getElementById('upload-progress').style.display = 'none';
+        }
+
+        // 3-option upload: each button creates a hidden input and triggers file explorer
+        function triggerUpload(uploadType) {
+            const acceptMap = { scanned: '.pdf', standard: '.pdf', docx: '.docx' };
+            const maxSizeMap = { scanned: 100 * 1024 * 1024, standard: 20 * 1024 * 1024, docx: 20 * 1024 * 1024 };
+            const labelMap = { scanned: 'Scanned PDF (OCR)', standard: 'Standard PDF', docx: 'Word Document' };
+
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = acceptMap[uploadType];
+            input.style.display = 'none';
+            document.body.appendChild(input);
+
+            input.addEventListener('change', async () => {
+                const file = input.files[0];
+                if (!file) { document.body.removeChild(input); return; }
+
+                // Validate file size
+                if (file.size > maxSizeMap[uploadType]) {
+                    const maxMB = maxSizeMap[uploadType] / (1024 * 1024);
+                    showToast(`File exceeds ${maxMB}MB limit for ${labelMap[uploadType]}`, 'warning');
+                    document.body.removeChild(input);
+                    return;
+                }
+
+                // Show progress
+                const progressEl = document.getElementById('upload-progress');
+                const progressText = document.getElementById('upload-progress-text');
+                progressText.textContent = uploadType === 'scanned'
+                    ? 'Uploading and performing OCR analysis... This may take a moment.'
+                    : 'Uploading and analyzing agreement...';
+                progressEl.style.display = 'block';
+
+                // Disable all upload buttons during upload
+                document.querySelectorAll('.upload-option-btn').forEach(b => b.disabled = true);
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const data = await api.upload(`/agreements/upload?upload_type=${uploadType}`, formData);
+                    showToast(data.message || 'Agreement uploaded and analyzed', 'success');
+                    closeUploadModal();
+                    loadAgreements();
+                } catch (err) {
+                    closeUploadModal();
+                    showErrorPopup('Upload Failed', err.message);
+                    progressEl.style.display = 'none';
+                } finally {
+                    document.querySelectorAll('.upload-option-btn').forEach(b => b.disabled = false);
+                    document.body.removeChild(input);
+                }
+            });
+
+            input.click();
+        }
+
+        // Notifications
+        async function loadNotifications() {
+            try {
+                const data = await api.get('/notifications/');
+                const notifications = data.notifications || [];
+                const unread = notifications.filter(n => !n.is_read);
+                const countEl = document.getElementById('notification-count');
+
+                if (unread.length > 0) {
+                    countEl.textContent = unread.length;
+                    countEl.style.display = 'flex';
+                } else {
+                    countEl.style.display = 'none';
+                }
+
+                const list = document.getElementById('notification-list');
+                if (notifications.length === 0) {
+                    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--color-text-muted);font-size:0.85rem">No notifications</div>';
+                } else {
+                    list.innerHTML = notifications.map(n => {
+                        const clickable = n.agreement_id ? 'clickable' : '';
+                        const clickAction = n.agreement_id
+                            ? (n.title && n.title.includes('Payment') ? `window.location.href='/payments'` : `window.location.href='/agreement/${n.agreement_id}'`)
+                            : '';
+                        return `
+                        <div class="notification-item ${n.is_read ? '' : 'unread'} ${clickable}" onclick="${clickAction ? clickAction : `markNotificationRead(${n.id})`}">
+                            <div class="notification-title">${n.title}</div>
+                            <div class="notification-message">${n.message}</div>
+                            <div class="notification-time">${formatDate(n.created_at)}</div>
+                            <button class="notification-delete" onclick="deleteNotification(${n.id}, event)" title="Delete notification">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                    `;
+                    }).join('');
+                }
+            } catch (err) {
+                // Silently fail
+            }
+        }
+
+        function toggleNotifications() {
+            const dd = document.getElementById('notification-dropdown');
+            dd.classList.toggle('open');
+        }
+
+        async function markNotificationRead(id) {
+            try {
+                await api.put(`/notifications/${id}/read`);
+                loadNotifications();
+            } catch (err) { /* silent */ }
+        }
+
+        async function markAllRead(e) {
+            e.stopPropagation();
+            try {
+                await api.put('/notifications/read-all');
+                loadNotifications();
+            } catch (err) { /* silent */ }
+        }
+
+        // Close notification dropdown on outside click
+        document.addEventListener('click', (e) => {
+            const bell = document.getElementById('notification-bell');
+            if (!bell.contains(e.target)) {
+                document.getElementById('notification-dropdown').classList.remove('open');
+            }
+        });
+
+        // Delete single notification
+        async function deleteNotification(id, e) {
+            e.stopPropagation();
+            try {
+                await api.delete(`/notifications/${id}`);
+                loadNotifications();
+            } catch (err) { /* silent */ }
+        }
+
+        // Clear all notifications
+        async function clearAllNotifications(e) {
+            e.stopPropagation();
+            try {
+                await api.delete('/notifications/');
+                loadNotifications();
+            } catch (err) { /* silent */ }
+        }
+
+        // Mobile sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar-backdrop').classList.toggle('open');
+        }
+        document.getElementById('sidebar-backdrop').addEventListener('click', toggleSidebar);
+
+        // Upload modal: only close via Cancel button (no outside click)
+        // This prevents accidental dismissal during file upload
+
+        // Custom Error Popup
+        function showErrorPopup(title, message) {
+            document.getElementById('error-popup-title').textContent = title;
+            document.getElementById('error-popup-message').textContent = message;
+            document.getElementById('error-popup-modal').classList.add('open');
+        }
+
+        function closeErrorPopup() {
+            document.getElementById('error-popup-modal').classList.remove('open');
+        }
+
+        // Close error popup on outside click
+        document.getElementById('error-popup-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'error-popup-modal') closeErrorPopup();
+        });
+
+        // Init
+        initUI();
+        loadAgreements();
+        loadNotifications();
+        loadPaymentSummary();
+    </script>
+</body>
+</html>
